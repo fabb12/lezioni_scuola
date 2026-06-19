@@ -98,14 +98,9 @@
   .pill.amber{background:#FCE9B6;color:#92600b}
   .pill.indigo{background:#DCE0FB;color:#3b3da8}
 
-  .dropzone{border:2px dashed var(--line);border-radius:14px;padding:30px;text-align:center;cursor:pointer;color:var(--muted);background:#FCFAF5;transition:border-color .15s,background .15s}
-  .dropzone:hover{border-color:var(--accent);background:#fff}
-  .dropzone .t{font-weight:800;color:var(--ink);margin-top:6px}
-  .dropzone .s{font-size:12px;margin-top:4px}
+  .imgpick{display:flex;gap:10px;flex-wrap:wrap}
 
   .empty-state{text-align:center;margin-top:48px;padding:54px 22px;border:2px dashed var(--line);border-radius:24px;background:rgba(255,255,255,.6)}
-  .infobar{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:600;color:#7a5a12;background:#FFF6DA;border:1px solid #F3E2A8;border-radius:14px;padding:11px 15px;margin-bottom:20px;line-height:1.45}
-  .infobar b{font-weight:900}
 
   .hidden{display:none}
   .no-print{}
@@ -200,6 +195,7 @@
 <main id="app"></main>
 
 <input type="file" id="fileComic" accept="image/*" class="hidden">
+<input type="file" id="fileCamera" accept="image/*" capture="environment" class="hidden">
 <input type="file" id="fileBackup" accept="application/json,.json" class="hidden">
 
 <script>
@@ -238,7 +234,6 @@ function renderLista(){
         <h2 style="font-family:var(--display);font-weight:600;margin:0 0 6px">Ancora nessuna lezione</h2>
         <p style="color:var(--muted);margin:0 0 20px">Crea la prima lezione: potrai vederla come una presentazione a slide.</p>
         <button class="btn btn-primary" onclick="nuova()">＋ Crea la prima lezione</button>
-        <p style="color:var(--muted);font-size:12.5px;margin:18px 0 0">Hai già un file di backup da un altro dispositivo? Usa <b>⬆️ Ripristina</b> in alto.</p>
       </div>`;
     return;
   }
@@ -250,10 +245,6 @@ function renderLista(){
     <div class="search no-print">
       <span>🔍</span>
       <input id="q" placeholder="Cerca per titolo o concetto…" value="${esc(query)}">
-    </div>
-    <div class="infobar no-print">
-      💾 Le lezioni restano salvate in questo browser. Per ritrovarle su un altro dispositivo
-      (o non perderle), usa <b>⬇️ Backup</b> per scaricare il file e <b>⬆️ Ripristina</b> per ricaricarlo altrove.
     </div>
     <div class="grid">
       ${filt.map(cardHTML).join("") || `<p style="color:var(--muted)">Nessuna lezione trovata.</p>`}
@@ -350,9 +341,9 @@ function renderComicArea(){
       <button class="btn btn-ghost btn-sm no-print" onclick="rimuoviFumetto()">✕ Rimuovi immagine</button>`;
   } else {
     area.innerHTML = `
-      <div class="dropzone" onclick="document.getElementById('fileComic').click()">
-        ⬆️<div class="t">Carica la tua striscia</div>
-        <div class="s">Una tua immagine o un fumetto per cui hai i diritti d'uso didattico</div>
+      <div class="imgpick">
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('fileComic').click()">🖼️ Carica immagine</button>
+        <button type="button" class="btn btn-ghost" onclick="document.getElementById('fileCamera').click()">📷 Scatta foto</button>
       </div>`;
   }
 }
@@ -426,7 +417,7 @@ function slideInner(s){
         </div>
         ${draft.fumetto
           ? `<img class="cover-img" src="${draft.fumetto}" alt="Striscia a fumetti">`
-          : (editMode?`<div class="addrow"><button class="btn btn-sm" onclick="document.getElementById('fileComic').click()">🖼️ Aggiungi striscia</button></div>`:"")}
+          : (editMode?`<div class="addrow"><button class="btn btn-sm" onclick="document.getElementById('fileComic').click()">🖼️ Aggiungi immagine</button> <button class="btn btn-sm" onclick="document.getElementById('fileCamera').click()">📷 Scatta foto</button></div>`:"")}
       </div>`;
   }
   // section
@@ -549,8 +540,8 @@ function elimina(id){
   lezioni = lezioni.filter(l=>l.id!==id); save(); render();
 }
 
-/* ── Caricamento fumetto ── */
-document.getElementById("fileComic").addEventListener("change", e=>{
+/* ── Caricamento immagine (galleria o fotocamera) ── */
+function caricaImmagine(e){
   const file = e.target.files[0]; if(!file) return;
   const r = new FileReader();
   r.onload = ()=>{
@@ -560,7 +551,9 @@ document.getElementById("fileComic").addEventListener("change", e=>{
   };
   r.readAsDataURL(file);
   e.target.value="";
-});
+}
+document.getElementById("fileComic").addEventListener("change", caricaImmagine);
+document.getElementById("fileCamera").addEventListener("change", caricaImmagine);
 
 /* ── Backup / Ripristino ── */
 document.getElementById("btnExport").addEventListener("click", ()=>{
