@@ -104,6 +104,8 @@
   .dropzone .s{font-size:12px;margin-top:4px}
 
   .empty-state{text-align:center;margin-top:48px;padding:54px 22px;border:2px dashed var(--line);border-radius:24px;background:rgba(255,255,255,.6)}
+  .infobar{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:600;color:#7a5a12;background:#FFF6DA;border:1px solid #F3E2A8;border-radius:14px;padding:11px 15px;margin-bottom:20px;line-height:1.45}
+  .infobar b{font-weight:900}
 
   .hidden{display:none}
   .no-print{}
@@ -236,6 +238,7 @@ function renderLista(){
         <h2 style="font-family:var(--display);font-weight:600;margin:0 0 6px">Ancora nessuna lezione</h2>
         <p style="color:var(--muted);margin:0 0 20px">Crea la prima lezione: potrai vederla come una presentazione a slide.</p>
         <button class="btn btn-primary" onclick="nuova()">＋ Crea la prima lezione</button>
+        <p style="color:var(--muted);font-size:12.5px;margin:18px 0 0">Hai già un file di backup da un altro dispositivo? Usa <b>⬆️ Ripristina</b> in alto.</p>
       </div>`;
     return;
   }
@@ -247,6 +250,10 @@ function renderLista(){
     <div class="search no-print">
       <span>🔍</span>
       <input id="q" placeholder="Cerca per titolo o concetto…" value="${esc(query)}">
+    </div>
+    <div class="infobar no-print">
+      💾 Le lezioni restano salvate in questo browser. Per ritrovarle su un altro dispositivo
+      (o non perderle), usa <b>⬇️ Backup</b> per scaricare il file e <b>⬆️ Ripristina</b> per ricaricarlo altrove.
     </div>
     <div class="grid">
       ${filt.map(cardHTML).join("") || `<p style="color:var(--muted)">Nessuna lezione trovata.</p>`}
@@ -557,10 +564,12 @@ document.getElementById("fileComic").addEventListener("change", e=>{
 
 /* ── Backup / Ripristino ── */
 document.getElementById("btnExport").addEventListener("click", ()=>{
+  if(!lezioni.length){ alert("Non c'è ancora nessuna lezione da salvare."); return; }
   const blob = new Blob([JSON.stringify(lezioni,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "lezioni-backup.json";
+  const d = new Date(), p = n=>String(n).padStart(2,"0");
+  a.download = `lezioni-backup-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
 });
@@ -572,8 +581,26 @@ document.getElementById("fileBackup").addEventListener("change", e=>{
     try{
       const data = JSON.parse(r.result);
       if(!Array.isArray(data)) throw new Error();
-      if(lezioni.length && !confirm("Sostituire le lezioni attuali con quelle del backup?")) return;
-      lezioni = data; save(); view="lista"; render();
+      if(lezioni.length){
+        const unisci = confirm(
+          `Il backup contiene ${data.length} lezioni.\n\n`+
+          `• OK = UNISCI: aggiunge/aggiorna senza cancellare le ${lezioni.length} lezioni attuali\n`+
+          `• Annulla = SOSTITUISCI tutto con il backup`);
+        if(unisci){
+          data.forEach(nuova=>{
+            if(nuova.id==null) nuova.id = Date.now()+Math.floor(Math.random()*1000);
+            const i = lezioni.findIndex(l=>l.id===nuova.id);
+            if(i>=0) lezioni[i]=nuova; else lezioni.push(nuova);
+          });
+        } else {
+          if(!confirm("Confermi di SOSTITUIRE tutte le lezioni attuali?")) return;
+          lezioni = data;
+        }
+      } else {
+        lezioni = data;
+      }
+      save(); view="lista"; render();
+      alert("Backup importato con successo. ✓");
     }catch(err){ alert("Il file non è un backup valido."); }
   };
   r.readAsText(file);
