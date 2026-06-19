@@ -4,61 +4,178 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le mie lezioni · Italiano e Lettura</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#FBF7EF; --ink:#2B2A26; --line:#E4DCC9; --yellow:#FCE38A;
-    --mint:#BFE3C6; --accent:#E07A5F; --accentDk:#C45B43; --muted:#8A8576;
-    --display:'Fredoka','Comic Sans MS',system-ui,sans-serif;
+    --paper:#FAF6EF; --ink:#2B2A26; --line:#E7E0D2; --muted:#8A8576;
+    --accent:#E07A5F; --accent2:#EF8A6E; --accentDk:#C45B43;
+    --card:#ffffff;
+    --shadow:0 14px 34px -16px rgba(43,42,38,.45);
+    --shadow-sm:0 6px 18px -10px rgba(43,42,38,.4);
+    --display:'Fredoka',system-ui,sans-serif;
     --body:'Nunito',system-ui,sans-serif;
+    --radius:20px;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body)}
-  button{font-family:var(--body)}
-  header{border-bottom:3px solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:10}
-  .wrap{max-width:980px;margin:0 auto;padding:18px 20px}
-  .head-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .logo{width:42px;height:42px;border-radius:12px;background:var(--accent);display:grid;place-items:center;flex-shrink:0;box-shadow:2px 2px 0 var(--ink);color:#fff;font-size:22px}
-  h1{margin:0;font-family:var(--display);font-weight:700;font-size:22px;line-height:1}
-  .sub{margin:2px 0 0;font-size:13px;color:var(--muted)}
-  main{max-width:980px;margin:0 auto;padding:24px 20px 80px}
-  .card{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:18px;box-shadow:3px 3px 0 var(--line)}
-  .grid{display:grid;gap:16px}
-  input,textarea{width:100%;padding:11px 14px;border-radius:10px;border:2px solid var(--line);font-size:15px;font-family:var(--body);background:var(--paper);outline:none;color:var(--ink)}
-  textarea{resize:vertical;line-height:1.5}
-  label.field{display:flex;align-items:center;gap:6px;font-weight:800;font-size:13px;margin-bottom:6px}
-  .fieldblock{margin-bottom:16px}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .btn{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--ink);padding:10px 16px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer}
-  .btn-primary{background:var(--accent);color:#fff;box-shadow:2px 2px 0 var(--ink)}
-  .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);font-weight:700;padding:8px 14px}
+  html,body{height:100%}
+  body{
+    margin:0;color:var(--ink);font-family:var(--body);
+    background:
+      radial-gradient(900px 500px at 10% -10%, #FFE7D8 0%, transparent 55%),
+      radial-gradient(900px 600px at 100% 0%, #E7F3EC 0%, transparent 50%),
+      linear-gradient(180deg,#FAF6EF 0%, #F3EEE3 100%);
+    background-attachment:fixed;
+    min-height:100%;
+  }
+  button{font-family:var(--body);cursor:pointer}
+
+  /* ── Header ── */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:rgba(250,246,239,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:14px 22px}
+  .head-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{
+    width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:24px;
+    box-shadow:0 8px 18px -6px rgba(224,122,95,.7);
+  }
+  h1{margin:0;font-family:var(--display);font-weight:700;font-size:23px;line-height:1.05;letter-spacing:.2px}
+  .sub{margin:3px 0 0;font-size:13px;color:var(--muted);font-weight:600}
+  .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-left:auto}
+
+  main{max-width:1040px;margin:0 auto;padding:28px 22px 90px}
+
+  /* ── Buttons ── */
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;border:0;padding:11px 17px;border-radius:13px;
+    font-weight:800;font-size:14px;transition:transform .12s ease, box-shadow .18s ease, background .18s ease;
+    background:#fff;color:var(--ink);box-shadow:var(--shadow-sm);
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:active{transform:translateY(0)}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 12px 22px -10px rgba(224,122,95,.85)}
+  .btn-ghost{background:rgba(255,255,255,.7);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+  .btn-ghost:hover{background:#fff;box-shadow:var(--shadow-sm)}
   .btn-ghost.danger{color:var(--accentDk)}
-  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid var(--ink);background:var(--line)}
-  .lez{display:flex;gap:16px;flex-wrap:wrap}
-  .thumb{width:160px;flex-shrink:0}
-  .thumb img{width:100%;border-radius:10px;border:2px solid var(--ink);display:block}
-  .thumb .empty{width:100%;aspect-ratio:3/2;border-radius:10px;border:2px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px;text-align:center;padding:8px}
-  .lez-body{flex:1;min-width:220px}
-  .lez-body h3{font-family:var(--display);font-size:20px;margin:0 0 4px}
-  .concetto{margin:0 0 10px;color:var(--accentDk);font-weight:700}
-  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap}
-  .search{position:relative;margin-bottom:20px}
-  .search input{padding-left:42px}
-  .search span{position:absolute;left:14px;top:11px;color:var(--muted)}
-  .dropzone{border:2px dashed var(--line);border-radius:12px;padding:28px;text-align:center;cursor:pointer;color:var(--muted);background:#fff}
-  .dropzone .t{font-weight:800;color:var(--ink)}
+  .btn-sm{padding:8px 13px;font-size:13px;border-radius:11px}
+
+  /* ── Cards / form ── */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .grid{display:grid;gap:18px}
+  input,textarea{
+    width:100%;padding:12px 15px;border-radius:12px;border:1.5px solid var(--line);
+    font-size:15px;font-family:var(--body);background:#FCFAF5;outline:none;color:var(--ink);
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(224,122,95,.14)}
+  textarea{resize:vertical;line-height:1.55}
+  label.field{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13px;margin-bottom:7px}
+  .fieldblock{margin-bottom:18px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+
+  /* ── Search ── */
+  .search{position:relative;margin-bottom:22px;max-width:480px}
+  .search input{padding-left:44px;border-radius:14px;background:#fff;box-shadow:var(--shadow-sm);border-color:transparent}
+  .search span{position:absolute;left:15px;top:12px;color:var(--muted)}
+
+  /* ── Lesson list cards ── */
+  .lez{display:flex;gap:18px;flex-wrap:wrap}
+  .card.lezcard{padding:16px;transition:transform .14s ease, box-shadow .18s ease}
+  .card.lezcard:hover{transform:translateY(-3px);box-shadow:0 22px 40px -18px rgba(43,42,38,.5)}
+  .thumb{width:172px;flex-shrink:0}
+  .thumb img{width:100%;border-radius:14px;display:block;box-shadow:var(--shadow-sm)}
+  .thumb .empty{width:100%;aspect-ratio:3/2;border-radius:14px;border:2px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px;text-align:center;padding:8px;background:#FCFAF5}
+  .lez-body{flex:1;min-width:230px}
+  .lez-body h3{font-family:var(--display);font-size:21px;margin:0 0 4px;font-weight:600}
+  .concetto{margin:0 0 12px;color:var(--accentDk);font-weight:800;font-size:14px}
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800;background:var(--line);color:var(--ink)}
+  .pill.mint{background:#CFF0DC;color:#0c6e43}
+  .pill.amber{background:#FCE9B6;color:#92600b}
+  .pill.indigo{background:#DCE0FB;color:#3b3da8}
+
+  .dropzone{border:2px dashed var(--line);border-radius:14px;padding:30px;text-align:center;cursor:pointer;color:var(--muted);background:#FCFAF5;transition:border-color .15s,background .15s}
+  .dropzone:hover{border-color:var(--accent);background:#fff}
+  .dropzone .t{font-weight:800;color:var(--ink);margin-top:6px}
   .dropzone .s{font-size:12px;margin-top:4px}
-  .empty-state{text-align:center;margin-top:50px;padding:40px 20px;border:2px dashed var(--line);border-radius:18px;background:#fff}
-  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+
+  .empty-state{text-align:center;margin-top:48px;padding:54px 22px;border:2px dashed var(--line);border-radius:24px;background:rgba(255,255,255,.6)}
+
   .hidden{display:none}
-  @media(max-width:560px){.two{grid-template-columns:1fr}}
-  /* Stampa: solo la lezione aperta */
+  .no-print{}
+
+  /* ── Slide presentation ── */
+  .stage-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .stage-top .grow{flex:1 1 auto}
+  .savedchip{font-size:13px;font-weight:800;color:#0c6e43;opacity:0;transition:opacity .3s ease}
+  .savedchip.show{opacity:1}
+  .stage{position:relative}
+  .slide{
+    position:relative;border-radius:26px;padding:clamp(26px,5vw,56px);
+    min-height:min(64vh,560px);display:flex;flex-direction:column;
+    box-shadow:var(--shadow);overflow:hidden;
+    animation:slidein .35s cubic-bezier(.2,.7,.2,1);
+  }
+  @keyframes slidein{from{opacity:0;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
+  .slide::after{content:"";position:absolute;inset:0;border-radius:26px;border:1px solid rgba(255,255,255,.5);pointer-events:none}
+  .slide .kicker{display:inline-flex;align-items:center;gap:10px;font-weight:900;font-size:14px;letter-spacing:.4px;text-transform:uppercase;opacity:.85}
+  .slide .kicker .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:rgba(255,255,255,.6)}
+  .slide h2{font-family:var(--display);font-weight:700;font-size:clamp(28px,5vw,46px);margin:14px 0 6px;line-height:1.08}
+  .slide .lead{font-size:clamp(17px,2.4vw,22px);font-weight:800;margin:0}
+  .slide .content{margin-top:auto}
+  .points{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:14px}
+  .points li{display:flex;gap:13px;align-items:flex-start;font-size:clamp(16px,2.2vw,21px);font-weight:700;line-height:1.4}
+  .points li .dot{flex-shrink:0;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;color:#fff;font-weight:900;margin-top:1px}
+  .slide .cover-img{margin-top:22px;max-width:min(100%,420px);border-radius:18px;box-shadow:var(--shadow);display:block}
+  .slide .num{position:absolute;top:22px;right:26px;font-weight:900;font-size:14px;opacity:.55}
+
+  /* slide themes (soft pastel gradients, dark ink) */
+  .t-cover{background:linear-gradient(135deg,#FFE8D6,#FFCBB0)}
+  .t-cover .dot,.t-cover .kicker .ico{background:linear-gradient(135deg,#E07A5F,#EF8A6E)}
+  .t-obj{background:linear-gradient(135deg,#FFF3C4,#FCE08A)}
+  .t-obj .dot{background:#D97706}
+  .t-online{background:linear-gradient(135deg,#D6F5E3,#A7F3D0)}
+  .t-online .dot{background:#059669}
+  .t-vivo{background:linear-gradient(135deg,#E4E9FF,#C7D2FE)}
+  .t-vivo .dot{background:#4F46E5}
+  .t-mat{background:linear-gradient(135deg,#FCE3F0,#FBCFE8)}
+  .t-mat .dot{background:#DB2777}
+
+  /* inline editing on slides */
+  .edit-on [contenteditable]{outline:none;border-radius:10px;transition:background .15s, box-shadow .15s}
+  .edit-on [contenteditable]:hover{background:rgba(255,255,255,.45)}
+  .edit-on [contenteditable]:focus{background:rgba(255,255,255,.8);box-shadow:0 0 0 3px rgba(43,42,38,.12)}
+  [contenteditable]{padding:2px 6px;margin:-2px -6px}
+  .edit-on .points li .dot{cursor:default}
+  .edit-hint{font-size:13px;font-weight:700;color:var(--muted);background:rgba(255,255,255,.7);padding:6px 12px;border-radius:999px}
+  .slide .addrow{margin-top:16px}
+  .slide .addrow .btn{background:rgba(255,255,255,.7)}
+
+  /* slide controls */
+  .controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:18px}
+  .nav-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:#fff;box-shadow:var(--shadow-sm);border:0}
+  .nav-btn:disabled{opacity:.35;cursor:default;transform:none}
+  .dots{display:flex;gap:8px}
+  .dots .d{width:10px;height:10px;border-radius:50%;background:var(--line);border:0;padding:0;transition:transform .15s, background .15s}
+  .dots .d.active{background:var(--accent);transform:scale(1.35)}
+
+  @media(max-width:560px){
+    .two{grid-template-columns:1fr}
+    .toolbar{width:100%}
+    .toolbar .btn{flex:1}
+  }
+
+  /* ── Print: tutte le slide impilate ── */
   @media print{
-    header,.no-print{display:none!important}
-    main{padding:0}
-    .card{border:none;box-shadow:none;padding:0}
+    header,.no-print,.controls,.stage-top{display:none!important}
     body{background:#fff}
+    main{padding:0;max-width:none}
+    .slide{box-shadow:none;page-break-after:always;min-height:auto;border:1px solid #ddd;margin-bottom:12px;animation:none}
+    .printall .slide{display:flex!important}
   }
 </style>
 </head>
@@ -71,9 +188,9 @@
       <p class="sub">Italiano e Lettura · scuola primaria</p>
     </div>
     <div class="toolbar no-print">
-      <button class="btn btn-ghost" id="btnExport">⬇️ Backup</button>
-      <button class="btn btn-ghost" id="btnImport">⬆️ Ripristina</button>
-      <button class="btn btn-primary" id="btnNew">＋ Nuova lezione</button>
+      <button class="btn btn-ghost btn-sm" id="btnExport">⬇️ Backup</button>
+      <button class="btn btn-ghost btn-sm" id="btnImport">⬆️ Ripristina</button>
+      <button class="btn btn-primary btn-sm" id="btnNew">＋ Nuova lezione</button>
     </div>
   </div>
 </header>
@@ -88,9 +205,11 @@ const STORAGE_KEY = "lezioni-italiano-v1";
 const EMPTY = () => ({id:null,titolo:"",concetto:"",fumetto:"",obiettivi:"",online:"",vivo:"",materiali:"",durata:""});
 
 let lezioni = [];
-let view = "lista";      // lista | edit
+let view = "lista";      // lista | edit | slide
 let draft = EMPTY();
 let query = "";
+let slideIndex = 0;
+let editMode = false;    // modifica inline nelle slide
 
 function load(){
   try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) lezioni = JSON.parse(raw); }
@@ -98,21 +217,24 @@ function load(){
 }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(lezioni)); }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function nl2br(s){ return esc(s).replace(/\n/g,"<br>"); }
+function lines(s){ return (s||"").split("\n").map(x=>x.replace(/^[\s•\-–·]+/,"").trim()).filter(Boolean); }
 
 const app = document.getElementById("app");
 
 function render(){
-  if(view==="lista") renderLista(); else renderEditor();
+  if(view==="lista") renderLista();
+  else if(view==="edit") renderEditor();
+  else renderSlides();
 }
 
+/* ───────────────────────── LISTA ───────────────────────── */
 function renderLista(){
   if(lezioni.length===0){
     app.innerHTML = `
       <div class="empty-state">
-        <div style="font-size:46px;margin-bottom:8px">📚</div>
-        <h2 style="font-family:var(--display);margin:0 0 6px">Ancora nessuna lezione</h2>
-        <p style="color:var(--muted);margin:0 0 18px">Crea la prima lezione e aggiungi la sua striscia a fumetti.</p>
+        <div style="font-size:50px;margin-bottom:10px">📚</div>
+        <h2 style="font-family:var(--display);font-weight:600;margin:0 0 6px">Ancora nessuna lezione</h2>
+        <p style="color:var(--muted);margin:0 0 20px">Crea la prima lezione: potrai vederla come una presentazione a slide.</p>
         <button class="btn btn-primary" onclick="nuova()">＋ Crea la prima lezione</button>
       </div>`;
     return;
@@ -127,7 +249,7 @@ function renderLista(){
       <input id="q" placeholder="Cerca per titolo o concetto…" value="${esc(query)}">
     </div>
     <div class="grid">
-      ${filt.map(cardHTML).join("")}
+      ${filt.map(cardHTML).join("") || `<p style="color:var(--muted)">Nessuna lezione trovata.</p>`}
     </div>`;
 
   const q = document.getElementById("q");
@@ -136,7 +258,7 @@ function renderLista(){
 
 function cardHTML(l){
   return `
-  <article class="card">
+  <article class="card lezcard">
     <div class="lez">
       <div class="thumb">
         ${l.fumetto ? `<img src="${l.fumetto}" alt="Striscia a fumetti">`
@@ -147,21 +269,23 @@ function cardHTML(l){
         ${l.concetto?`<p class="concetto">${esc(l.concetto)}</p>`:""}
         <div class="pills">
           ${l.durata?`<span class="pill">⏱️ ${esc(l.durata)}</span>`:""}
-          ${l.online?`<span class="pill" style="background:var(--mint)">💻 Online</span>`:""}
-          ${l.vivo?`<span class="pill" style="background:var(--yellow)">👥 In presenza</span>`:""}
+          ${l.online?`<span class="pill mint">💻 Online</span>`:""}
+          ${l.vivo?`<span class="pill amber">👥 In presenza</span>`:""}
         </div>
         <div class="actions no-print">
-          <button class="btn btn-ghost" onclick="modifica(${l.id})">✏️ Apri</button>
-          <button class="btn btn-ghost danger" onclick="elimina(${l.id})">🗑️ Elimina</button>
+          <button class="btn btn-primary btn-sm" onclick="presenta(${l.id})">▶️ Presenta</button>
+          <button class="btn btn-ghost btn-sm" onclick="modifica(${l.id})">✏️ Modifica</button>
+          <button class="btn btn-ghost btn-sm danger" onclick="elimina(${l.id})">🗑️</button>
         </div>
       </div>
     </div>
   </article>`;
 }
 
+/* ───────────────────────── EDITOR (scheda completa) ───────────────────────── */
 function renderEditor(){
   app.innerHTML = `
-    <button class="btn btn-ghost no-print" onclick="annulla()" style="margin-bottom:16px">‹ Torna alle lezioni</button>
+    <button class="btn btn-ghost btn-sm no-print" onclick="annulla()" style="margin-bottom:16px">‹ Torna alle lezioni</button>
     <div class="card">
       <div class="fieldblock">
         <label class="field">Titolo della lezione</label>
@@ -177,22 +301,22 @@ function renderEditor(){
       </div>
       <div class="fieldblock">
         <label class="field">🎯 Obiettivi didattici</label>
-        <textarea id="f_obiettivi" rows="3" placeholder="Cosa impareranno i bambini…">${esc(draft.obiettivi)}</textarea>
+        <textarea id="f_obiettivi" rows="3" placeholder="Un obiettivo per riga…">${esc(draft.obiettivi)}</textarea>
       </div>
       <div class="two">
         <div class="fieldblock">
           <label class="field">💻 Attività online</label>
-          <textarea id="f_online" rows="4" placeholder="Come svolgerla a distanza…">${esc(draft.online)}</textarea>
+          <textarea id="f_online" rows="4" placeholder="Un passaggio per riga…">${esc(draft.online)}</textarea>
         </div>
         <div class="fieldblock">
           <label class="field">👥 Attività in presenza</label>
-          <textarea id="f_vivo" rows="4" placeholder="Come svolgerla in classe…">${esc(draft.vivo)}</textarea>
+          <textarea id="f_vivo" rows="4" placeholder="Un passaggio per riga…">${esc(draft.vivo)}</textarea>
         </div>
       </div>
       <div class="two">
         <div class="fieldblock">
-          <label class="field">Materiali necessari</label>
-          <input id="f_materiali" value="${esc(draft.materiali)}" placeholder="Es. quaderno, schede stampate, LIM">
+          <label class="field">🎒 Materiali necessari</label>
+          <input id="f_materiali" value="${esc(draft.materiali)}" placeholder="Es. quaderno, schede, LIM">
         </div>
         <div class="fieldblock">
           <label class="field">⏱️ Durata</label>
@@ -200,8 +324,7 @@ function renderEditor(){
         </div>
       </div>
       <div class="actions no-print" style="margin-top:6px">
-        <button class="btn btn-primary" onclick="salva()">💾 Salva lezione</button>
-        <button class="btn btn-ghost" onclick="window.print()">🖨️ Stampa</button>
+        <button class="btn btn-primary" onclick="salvaEditor()">💾 Salva e presenta</button>
         <button class="btn btn-ghost" onclick="annulla()">Annulla</button>
       </div>
     </div>`;
@@ -213,10 +336,11 @@ function renderEditor(){
 
 function renderComicArea(){
   const area = document.getElementById("comicArea");
+  if(!area) return;
   if(draft.fumetto){
     area.innerHTML = `
-      <img src="${draft.fumetto}" alt="Anteprima striscia" style="max-width:100%;border-radius:10px;border:2px solid var(--ink);display:block;margin-bottom:8px">
-      <button class="btn btn-ghost no-print" onclick="rimuoviFumetto()">✕ Rimuovi immagine</button>`;
+      <img src="${draft.fumetto}" alt="Anteprima striscia" style="max-width:100%;border-radius:12px;box-shadow:var(--shadow-sm);display:block;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm no-print" onclick="rimuoviFumetto()">✕ Rimuovi immagine</button>`;
   } else {
     area.innerHTML = `
       <div class="dropzone" onclick="document.getElementById('fileComic').click()">
@@ -226,33 +350,212 @@ function renderComicArea(){
   }
 }
 
-// ── Azioni ──
+/* ───────────────────────── SLIDE / PRESENTAZIONE ───────────────────────── */
+function buildSlides(){
+  const s = [{type:"cover", theme:"t-cover", ico:"📖", kicker:"Lezione"}];
+  const secs = [
+    {key:"obiettivi", theme:"t-obj",    ico:"🎯", kicker:"Obiettivi", title:"Obiettivi didattici"},
+    {key:"online",    theme:"t-online", ico:"💻", kicker:"Online",    title:"Attività online"},
+    {key:"vivo",      theme:"t-vivo",   ico:"👥", kicker:"In classe", title:"Attività in presenza"},
+    {key:"mat",       theme:"t-mat",    ico:"🎒", kicker:"Materiali", title:"Materiali e durata"},
+  ];
+  secs.forEach(sec=>{
+    const has = sec.key==="mat" ? (draft.materiali||draft.durata) : draft[sec.key];
+    if(editMode || has) s.push({type:"section", ...sec});
+  });
+  return s;
+}
+
+function renderSlides(){
+  const slides = buildSlides();
+  if(slideIndex>=slides.length) slideIndex = slides.length-1;
+  if(slideIndex<0) slideIndex = 0;
+  const s = slides[slideIndex];
+
+  app.innerHTML = `
+    <div class="stage-top no-print">
+      <button class="btn btn-ghost btn-sm" onclick="annulla()">‹ Lezioni</button>
+      <span class="grow"></span>
+      <span class="savedchip" id="savedchip">✓ Salvato</span>
+      <button class="btn ${editMode?'btn-primary':'btn-ghost'} btn-sm" onclick="toggleEdit()">
+        ${editMode?'✅ Fine modifica':'✏️ Abilita modifica'}
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="modifica(${draft.id})">🗂️ Scheda</button>
+      <button class="btn btn-ghost btn-sm" onclick="stampaTutto()">🖨️ Stampa</button>
+    </div>
+    <div class="stage ${editMode?'edit-on':''}">
+      <div class="slide ${s.theme}" id="slide">
+        <span class="num">${slideIndex+1} / ${slides.length}</span>
+        ${slideInner(s)}
+      </div>
+    </div>
+    <div class="controls no-print">
+      <button class="nav-btn" id="prev" ${slideIndex===0?'disabled':''}>‹</button>
+      <div class="dots">
+        ${slides.map((_,i)=>`<button class="d ${i===slideIndex?'active':''}" onclick="goTo(${i})" aria-label="Slide ${i+1}"></button>`).join("")}
+      </div>
+      <button class="nav-btn" id="next" ${slideIndex===slides.length-1?'disabled':''}>›</button>
+    </div>
+    ${editMode?`<p class="no-print" style="text-align:center;color:var(--muted);font-weight:700;font-size:13px;margin-top:12px">Tocca un testo per modificarlo · le modifiche si salvano da sole</p>`:""}`;
+
+  const prev=document.getElementById("prev"), next=document.getElementById("next");
+  if(prev) prev.onclick=()=>goTo(slideIndex-1);
+  if(next) next.onclick=()=>goTo(slideIndex+1);
+
+  if(editMode) wireEditable(s);
+}
+
+function slideInner(s){
+  if(s.type==="cover"){
+    return `
+      <div class="kicker"><span class="ico">${s.ico}</span> ${s.kicker}</div>
+      <h2 ${editAttr("titolo")} data-ph="Titolo della lezione">${esc(draft.titolo)||(editMode?'':'Senza titolo')}</h2>
+      <p class="lead" ${editAttr("concetto")} data-ph="Concetto chiave" style="color:var(--accentDk)">${esc(draft.concetto)}</p>
+      <div class="content">
+        <div class="pills" style="margin-top:18px">
+          ${draft.durata?`<span class="pill">⏱️ ${esc(draft.durata)}</span>`:""}
+          ${draft.online?`<span class="pill mint">💻 Online</span>`:""}
+          ${draft.vivo?`<span class="pill amber">👥 In presenza</span>`:""}
+        </div>
+        ${draft.fumetto
+          ? `<img class="cover-img" src="${draft.fumetto}" alt="Striscia a fumetti">`
+          : (editMode?`<div class="addrow"><button class="btn btn-sm" onclick="document.getElementById('fileComic').click()">🖼️ Aggiungi striscia</button></div>`:"")}
+      </div>`;
+  }
+  // section
+  const txt = s.key==="mat" ? draft.materiali : draft[s.key];
+  const pts = lines(txt);
+  let body;
+  if(editMode){
+    body = `
+      <ul class="points" id="pts">
+        ${(pts.length?pts:[""]).map((p,i)=>pointEdit(s.key,i,p)).join("")}
+      </ul>
+      <div class="addrow"><button class="btn btn-sm" onclick="addPoint('${s.key}')">＋ Aggiungi punto</button></div>
+      ${s.key==="mat"?durataEdit():""}`;
+  } else {
+    body = `
+      <ul class="points">
+        ${pts.map((p,i)=>`<li><span class="dot">${i+1}</span><span>${esc(p)}</span></li>`).join("")}
+      </ul>
+      ${(s.key==="mat"&&draft.durata)?`<div class="pills" style="margin-top:18px"><span class="pill">⏱️ ${esc(draft.durata)}</span></div>`:""}`;
+  }
+  return `
+    <div class="kicker"><span class="ico">${s.ico}</span> ${s.kicker}</div>
+    <h2>${esc(s.title)}</h2>
+    <div class="content">${body}</div>`;
+}
+
+function pointEdit(key,i,val){
+  return `<li><span class="dot">${i+1}</span><span class="pt" contenteditable data-key="${key}" data-i="${i}" data-ph="Scrivi un punto…">${esc(val)}</span></li>`;
+}
+function durataEdit(){
+  return `<div class="addrow"><label style="font-weight:800;font-size:14px">⏱️ Durata:
+    <span contenteditable class="dur" data-ph="es. 45 min" style="background:rgba(255,255,255,.6);border-radius:8px;padding:3px 10px;margin-left:6px;display:inline-block;min-width:90px">${esc(draft.durata)}</span>
+  </label></div>`;
+}
+function editAttr(key){ return editMode?`contenteditable data-key="${key}"`:""; }
+
+function wireEditable(s){
+  // titolo / concetto (cover)
+  app.querySelectorAll('[contenteditable][data-key]').forEach(el=>{
+    el.addEventListener("input", ()=>{
+      draft[el.dataset.key] = el.innerText.trim();
+      persist();
+    });
+  });
+  // punti multilinea -> ricompone il testo
+  const collectPts = ()=>{
+    if(s.type!=="section") return;
+    const field = s.key==="mat" ? "materiali" : s.key;
+    const vals = [...app.querySelectorAll('.pt')].map(e=>e.innerText.trim()).filter(Boolean);
+    draft[field] = vals.join("\n");
+    persist();
+  };
+  app.querySelectorAll('.pt').forEach(el=> el.addEventListener("input", collectPts));
+  const dur = app.querySelector('.dur');
+  if(dur) dur.addEventListener("input", ()=>{ draft.durata = dur.innerText.trim(); persist(); });
+
+  // placeholder visivo per contenteditable vuoti
+  app.querySelectorAll('[contenteditable]').forEach(el=>{
+    const ph = el.dataset.ph||"";
+    const upd=()=>{ if(!el.innerText.trim()){ el.classList.add('is-empty'); } else el.classList.remove('is-empty'); };
+    el.dataset._ph=ph; upd(); el.addEventListener("input",upd);
+  });
+}
+
+function addPoint(key){
+  const field = key==="mat" ? "materiali" : key;
+  draft[field] = (draft[field] ? draft[field]+"\n" : "");
+  persist(); renderSlides();
+  const pts = app.querySelectorAll('.pt'); if(pts.length) pts[pts.length-1].focus();
+}
+
+function persist(){
+  if(!draft.titolo.trim() && !draft.id) return;
+  upsert();
+  const chip = document.getElementById("savedchip");
+  if(chip){ chip.classList.add("show"); clearTimeout(persist._t); persist._t=setTimeout(()=>chip.classList.remove("show"),1100); }
+}
+function upsert(){
+  if(draft.id==null) draft.id = Date.now();
+  const i = lezioni.findIndex(l=>l.id===draft.id);
+  if(i>=0) lezioni[i]=JSON.parse(JSON.stringify(draft)); else lezioni.push(JSON.parse(JSON.stringify(draft)));
+  save();
+}
+
+function goTo(i){
+  const n = buildSlides().length;
+  slideIndex = Math.max(0, Math.min(n-1, i));
+  renderSlides();
+}
+function toggleEdit(){ editMode = !editMode; renderSlides(); }
+
+function stampaTutto(){
+  // mostra tutte le slide in stampa
+  const slides = buildSlides();
+  const wasEdit = editMode; editMode=false;
+  let html="";
+  slides.forEach((s,idx)=>{ slideIndex=idx; html+=`<div class="slide ${s.theme}"><span class="num">${idx+1} / ${slides.length}</span>${slideInner(s)}</div>`; });
+  const stage = document.createElement("div");
+  stage.className="printall"; stage.id="printstage"; stage.innerHTML=html;
+  app.appendChild(stage);
+  window.print();
+  stage.remove();
+  editMode=wasEdit; renderSlides();
+}
+
+/* ───────────────────────── AZIONI ───────────────────────── */
 function nuova(){ draft = EMPTY(); draft.id = Date.now(); view="edit"; render(); }
-function modifica(id){ draft = JSON.parse(JSON.stringify(lezioni.find(l=>l.id===id))); view="edit"; render(); }
-function annulla(){ view="lista"; draft=EMPTY(); render(); }
+function modifica(id){ draft = JSON.parse(JSON.stringify(lezioni.find(l=>l.id===id))); view="edit"; editMode=false; render(); }
+function presenta(id){ draft = JSON.parse(JSON.stringify(lezioni.find(l=>l.id===id))); view="slide"; slideIndex=0; editMode=false; render(); }
+function annulla(){ view="lista"; editMode=false; draft=EMPTY(); render(); }
 function rimuoviFumetto(){ draft.fumetto=""; renderComicArea(); }
 
-function salva(){
+function salvaEditor(){
   if(!draft.titolo.trim()){ alert("Dai un titolo alla lezione prima di salvare."); return; }
-  const i = lezioni.findIndex(l=>l.id===draft.id);
-  if(i>=0) lezioni[i]=draft; else lezioni.push(draft);
-  save(); view="lista"; draft=EMPTY(); render();
+  upsert();
+  view="slide"; slideIndex=0; editMode=false; render();
 }
 function elimina(id){
   if(!confirm("Eliminare questa lezione? L'azione non è reversibile.")) return;
   lezioni = lezioni.filter(l=>l.id!==id); save(); render();
 }
 
-// ── Caricamento fumetto ──
+/* ── Caricamento fumetto ── */
 document.getElementById("fileComic").addEventListener("change", e=>{
   const file = e.target.files[0]; if(!file) return;
   const r = new FileReader();
-  r.onload = ()=>{ draft.fumetto = r.result; renderComicArea(); };
+  r.onload = ()=>{
+    draft.fumetto = r.result;
+    if(view==="edit") renderComicArea();
+    else { persist(); renderSlides(); }
+  };
   r.readAsDataURL(file);
   e.target.value="";
 });
 
-// ── Backup / Ripristino ──
+/* ── Backup / Ripristino ── */
 document.getElementById("btnExport").addEventListener("click", ()=>{
   const blob = new Blob([JSON.stringify(lezioni,null,2)], {type:"application/json"});
   const a = document.createElement("a");
@@ -279,7 +582,21 @@ document.getElementById("fileBackup").addEventListener("change", e=>{
 
 document.getElementById("btnNew").addEventListener("click", nuova);
 
-// ── Avvio ──
+/* ── Tastiera per le slide ── */
+document.addEventListener("keydown", e=>{
+  if(view!=="slide") return;
+  if(e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  if(e.key==="ArrowRight") goTo(slideIndex+1);
+  else if(e.key==="ArrowLeft") goTo(slideIndex-1);
+  else if(e.key==="Escape") annulla();
+});
+
+/* placeholder per contenteditable */
+const ph = document.createElement("style");
+ph.textContent = `[contenteditable].is-empty:before{content:attr(data-ph);opacity:.45;font-weight:600}`;
+document.head.appendChild(ph);
+
+/* ── Avvio ── */
 load();
 render();
 </script>
