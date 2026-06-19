@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le mie lezioni · Italiano e Lettura</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF7EF; --ink:#2B2A26; --line:#E4DCC9; --yellow:#FCE38A;
+    --mint:#BFE3C6; --accent:#E07A5F; --accentDk:#C45B43; --muted:#8A8576;
+    --display:'Fredoka','Comic Sans MS',system-ui,sans-serif;
+    --body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body)}
+  button{font-family:var(--body)}
+  header{border-bottom:3px solid var(--ink);background:var(--paper);position:sticky;top:0;z-index:10}
+  .wrap{max-width:980px;margin:0 auto;padding:18px 20px}
+  .head-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .logo{width:42px;height:42px;border-radius:12px;background:var(--accent);display:grid;place-items:center;flex-shrink:0;box-shadow:2px 2px 0 var(--ink);color:#fff;font-size:22px}
+  h1{margin:0;font-family:var(--display);font-weight:700;font-size:22px;line-height:1}
+  .sub{margin:2px 0 0;font-size:13px;color:var(--muted)}
+  main{max-width:980px;margin:0 auto;padding:24px 20px 80px}
+  .card{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:18px;box-shadow:3px 3px 0 var(--line)}
+  .grid{display:grid;gap:16px}
+  input,textarea{width:100%;padding:11px 14px;border-radius:10px;border:2px solid var(--line);font-size:15px;font-family:var(--body);background:var(--paper);outline:none;color:var(--ink)}
+  textarea{resize:vertical;line-height:1.5}
+  label.field{display:flex;align-items:center;gap:6px;font-weight:800;font-size:13px;margin-bottom:6px}
+  .fieldblock{margin-bottom:16px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .btn{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--ink);padding:10px 16px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:2px 2px 0 var(--ink)}
+  .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line);font-weight:700;padding:8px 14px}
+  .btn-ghost.danger{color:var(--accentDk)}
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid var(--ink);background:var(--line)}
+  .lez{display:flex;gap:16px;flex-wrap:wrap}
+  .thumb{width:160px;flex-shrink:0}
+  .thumb img{width:100%;border-radius:10px;border:2px solid var(--ink);display:block}
+  .thumb .empty{width:100%;aspect-ratio:3/2;border-radius:10px;border:2px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px;text-align:center;padding:8px}
+  .lez-body{flex:1;min-width:220px}
+  .lez-body h3{font-family:var(--display);font-size:20px;margin:0 0 4px}
+  .concetto{margin:0 0 10px;color:var(--accentDk);font-weight:700}
+  .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .search{position:relative;margin-bottom:20px}
+  .search input{padding-left:42px}
+  .search span{position:absolute;left:14px;top:11px;color:var(--muted)}
+  .dropzone{border:2px dashed var(--line);border-radius:12px;padding:28px;text-align:center;cursor:pointer;color:var(--muted);background:#fff}
+  .dropzone .t{font-weight:800;color:var(--ink)}
+  .dropzone .s{font-size:12px;margin-top:4px}
+  .empty-state{text-align:center;margin-top:50px;padding:40px 20px;border:2px dashed var(--line);border-radius:18px;background:#fff}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+  .hidden{display:none}
+  @media(max-width:560px){.two{grid-template-columns:1fr}}
+  /* Stampa: solo la lezione aperta */
+  @media print{
+    header,.no-print{display:none!important}
+    main{padding:0}
+    .card{border:none;box-shadow:none;padding:0}
+    body{background:#fff}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap head-row">
+    <div class="logo">📖</div>
+    <div style="flex:1 1 auto">
+      <h1>Le mie lezioni</h1>
+      <p class="sub">Italiano e Lettura · scuola primaria</p>
+    </div>
+    <div class="toolbar no-print">
+      <button class="btn btn-ghost" id="btnExport">⬇️ Backup</button>
+      <button class="btn btn-ghost" id="btnImport">⬆️ Ripristina</button>
+      <button class="btn btn-primary" id="btnNew">＋ Nuova lezione</button>
+    </div>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<input type="file" id="fileComic" accept="image/*" class="hidden">
+<input type="file" id="fileBackup" accept="application/json,.json" class="hidden">
+
+<script>
+const STORAGE_KEY = "lezioni-italiano-v1";
+const EMPTY = () => ({id:null,titolo:"",concetto:"",fumetto:"",obiettivi:"",online:"",vivo:"",materiali:"",durata:""});
+
+let lezioni = [];
+let view = "lista";      // lista | edit
+let draft = EMPTY();
+let query = "";
+
+function load(){
+  try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) lezioni = JSON.parse(raw); }
+  catch(e){ lezioni = []; }
+}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(lezioni)); }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function nl2br(s){ return esc(s).replace(/\n/g,"<br>"); }
+
+const app = document.getElementById("app");
+
+function render(){
+  if(view==="lista") renderLista(); else renderEditor();
+}
+
+function renderLista(){
+  if(lezioni.length===0){
+    app.innerHTML = `
+      <div class="empty-state">
+        <div style="font-size:46px;margin-bottom:8px">📚</div>
+        <h2 style="font-family:var(--display);margin:0 0 6px">Ancora nessuna lezione</h2>
+        <p style="color:var(--muted);margin:0 0 18px">Crea la prima lezione e aggiungi la sua striscia a fumetti.</p>
+        <button class="btn btn-primary" onclick="nuova()">＋ Crea la prima lezione</button>
+      </div>`;
+    return;
+  }
+  const filt = lezioni.filter(l =>
+    (l.titolo||"").toLowerCase().includes(query.toLowerCase()) ||
+    (l.concetto||"").toLowerCase().includes(query.toLowerCase()));
+
+  app.innerHTML = `
+    <div class="search no-print">
+      <span>🔍</span>
+      <input id="q" placeholder="Cerca per titolo o concetto…" value="${esc(query)}">
+    </div>
+    <div class="grid">
+      ${filt.map(cardHTML).join("")}
+    </div>`;
+
+  const q = document.getElementById("q");
+  q.addEventListener("input", e => { query = e.target.value; const p=q.selectionStart; renderLista(); const nq=document.getElementById("q"); nq.focus(); nq.setSelectionRange(p,p); });
+}
+
+function cardHTML(l){
+  return `
+  <article class="card">
+    <div class="lez">
+      <div class="thumb">
+        ${l.fumetto ? `<img src="${l.fumetto}" alt="Striscia a fumetti">`
+                    : `<div class="empty">🖼️<br>nessuna striscia</div>`}
+      </div>
+      <div class="lez-body">
+        <h3>${esc(l.titolo)}</h3>
+        ${l.concetto?`<p class="concetto">${esc(l.concetto)}</p>`:""}
+        <div class="pills">
+          ${l.durata?`<span class="pill">⏱️ ${esc(l.durata)}</span>`:""}
+          ${l.online?`<span class="pill" style="background:var(--mint)">💻 Online</span>`:""}
+          ${l.vivo?`<span class="pill" style="background:var(--yellow)">👥 In presenza</span>`:""}
+        </div>
+        <div class="actions no-print">
+          <button class="btn btn-ghost" onclick="modifica(${l.id})">✏️ Apri</button>
+          <button class="btn btn-ghost danger" onclick="elimina(${l.id})">🗑️ Elimina</button>
+        </div>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderEditor(){
+  app.innerHTML = `
+    <button class="btn btn-ghost no-print" onclick="annulla()" style="margin-bottom:16px">‹ Torna alle lezioni</button>
+    <div class="card">
+      <div class="fieldblock">
+        <label class="field">Titolo della lezione</label>
+        <input id="f_titolo" value="${esc(draft.titolo)}" placeholder="Es. La virgola e la pausa">
+      </div>
+      <div class="fieldblock">
+        <label class="field">Concetto chiave</label>
+        <input id="f_concetto" value="${esc(draft.concetto)}" placeholder="Es. Riconoscere le pause nella lettura">
+      </div>
+      <div class="fieldblock">
+        <label class="field">Striscia a fumetti</label>
+        <div id="comicArea"></div>
+      </div>
+      <div class="fieldblock">
+        <label class="field">🎯 Obiettivi didattici</label>
+        <textarea id="f_obiettivi" rows="3" placeholder="Cosa impareranno i bambini…">${esc(draft.obiettivi)}</textarea>
+      </div>
+      <div class="two">
+        <div class="fieldblock">
+          <label class="field">💻 Attività online</label>
+          <textarea id="f_online" rows="4" placeholder="Come svolgerla a distanza…">${esc(draft.online)}</textarea>
+        </div>
+        <div class="fieldblock">
+          <label class="field">👥 Attività in presenza</label>
+          <textarea id="f_vivo" rows="4" placeholder="Come svolgerla in classe…">${esc(draft.vivo)}</textarea>
+        </div>
+      </div>
+      <div class="two">
+        <div class="fieldblock">
+          <label class="field">Materiali necessari</label>
+          <input id="f_materiali" value="${esc(draft.materiali)}" placeholder="Es. quaderno, schede stampate, LIM">
+        </div>
+        <div class="fieldblock">
+          <label class="field">⏱️ Durata</label>
+          <input id="f_durata" value="${esc(draft.durata)}" placeholder="Es. 45 min">
+        </div>
+      </div>
+      <div class="actions no-print" style="margin-top:6px">
+        <button class="btn btn-primary" onclick="salva()">💾 Salva lezione</button>
+        <button class="btn btn-ghost" onclick="window.print()">🖨️ Stampa</button>
+        <button class="btn btn-ghost" onclick="annulla()">Annulla</button>
+      </div>
+    </div>`;
+  renderComicArea();
+  ["titolo","concetto","obiettivi","online","vivo","materiali","durata"].forEach(k=>{
+    document.getElementById("f_"+k).addEventListener("input", e=>{ draft[k]=e.target.value; });
+  });
+}
+
+function renderComicArea(){
+  const area = document.getElementById("comicArea");
+  if(draft.fumetto){
+    area.innerHTML = `
+      <img src="${draft.fumetto}" alt="Anteprima striscia" style="max-width:100%;border-radius:10px;border:2px solid var(--ink);display:block;margin-bottom:8px">
+      <button class="btn btn-ghost no-print" onclick="rimuoviFumetto()">✕ Rimuovi immagine</button>`;
+  } else {
+    area.innerHTML = `
+      <div class="dropzone" onclick="document.getElementById('fileComic').click()">
+        ⬆️<div class="t">Carica la tua striscia</div>
+        <div class="s">Una tua immagine o un fumetto per cui hai i diritti d'uso didattico</div>
+      </div>`;
+  }
+}
+
+// ── Azioni ──
+function nuova(){ draft = EMPTY(); draft.id = Date.now(); view="edit"; render(); }
+function modifica(id){ draft = JSON.parse(JSON.stringify(lezioni.find(l=>l.id===id))); view="edit"; render(); }
+function annulla(){ view="lista"; draft=EMPTY(); render(); }
+function rimuoviFumetto(){ draft.fumetto=""; renderComicArea(); }
+
+function salva(){
+  if(!draft.titolo.trim()){ alert("Dai un titolo alla lezione prima di salvare."); return; }
+  const i = lezioni.findIndex(l=>l.id===draft.id);
+  if(i>=0) lezioni[i]=draft; else lezioni.push(draft);
+  save(); view="lista"; draft=EMPTY(); render();
+}
+function elimina(id){
+  if(!confirm("Eliminare questa lezione? L'azione non è reversibile.")) return;
+  lezioni = lezioni.filter(l=>l.id!==id); save(); render();
+}
+
+// ── Caricamento fumetto ──
+document.getElementById("fileComic").addEventListener("change", e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = ()=>{ draft.fumetto = r.result; renderComicArea(); };
+  r.readAsDataURL(file);
+  e.target.value="";
+});
+
+// ── Backup / Ripristino ──
+document.getElementById("btnExport").addEventListener("click", ()=>{
+  const blob = new Blob([JSON.stringify(lezioni,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "lezioni-backup.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById("btnImport").addEventListener("click", ()=> document.getElementById("fileBackup").click());
+document.getElementById("fileBackup").addEventListener("change", e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const data = JSON.parse(r.result);
+      if(!Array.isArray(data)) throw new Error();
+      if(lezioni.length && !confirm("Sostituire le lezioni attuali con quelle del backup?")) return;
+      lezioni = data; save(); view="lista"; render();
+    }catch(err){ alert("Il file non è un backup valido."); }
+  };
+  r.readAsText(file);
+  e.target.value="";
+});
+
+document.getElementById("btnNew").addEventListener("click", nuova);
+
+// ── Avvio ──
+load();
+render();
+</script>
+</body>
+</html>
