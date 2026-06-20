@@ -659,7 +659,13 @@ async function driveFetch(url, opts){
   o.headers = Object.assign({Authorization:"Bearer "+driveToken}, o.headers||{});
   const r = await fetch(url, o);
   if(r.status===401){ driveToken=null; throw new Error("Sessione scaduta, riprova."); }
-  if(!r.ok) throw new Error("Errore Drive ("+r.status+")");
+  if(!r.ok){
+    let dett = "";
+    try{ const e = await r.json(); dett = (e.error && e.error.message) ? " · "+e.error.message : ""; }catch(_){}
+    if(r.status===403 && /Drive API/i.test(dett))
+      throw new Error("Attiva la Google Drive API per il progetto e riprova.");
+    throw new Error("Errore Drive ("+r.status+")"+dett);
+  }
   return r;
 }
 
