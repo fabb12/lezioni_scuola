@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le mie lezioni · Italiano e Lettura</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root{
     --paper:#FAF6EF; --ink:#2B2A26; --line:#E7E0D2; --muted:#8A8576;
@@ -100,6 +101,13 @@
 
   .imgpick{display:flex;gap:10px;flex-wrap:wrap}
 
+  /* ── Drive ── */
+  .drivechip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:#0c6e43;background:#CFF0DC;padding:7px 11px;border-radius:11px}
+  .iconbtn{padding:8px 11px;font-size:14px}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-weight:800;font-size:14px;padding:12px 20px;border-radius:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--accentDk)}
+
   .empty-state{text-align:center;margin-top:48px;padding:54px 22px;border:2px dashed var(--line);border-radius:24px;background:rgba(255,255,255,.6)}
 
   .hidden{display:none}
@@ -184,11 +192,7 @@
       <h1>Le mie lezioni</h1>
       <p class="sub">Italiano e Lettura · scuola primaria</p>
     </div>
-    <div class="toolbar no-print">
-      <button class="btn btn-ghost btn-sm" id="btnExport">⬇️ Backup</button>
-      <button class="btn btn-ghost btn-sm" id="btnImport">⬆️ Ripristina</button>
-      <button class="btn btn-primary btn-sm" id="btnNew">＋ Nuova lezione</button>
-    </div>
+    <div class="toolbar no-print" id="toolbar"></div>
   </div>
 </header>
 
@@ -198,8 +202,17 @@
 <input type="file" id="fileCamera" accept="image/*" capture="environment" class="hidden">
 <input type="file" id="fileBackup" accept="application/json,.json" class="hidden">
 
+<div class="toast" id="toast"></div>
+
 <script>
 const STORAGE_KEY = "lezioni-italiano-v1";
+
+/* ⚙️ CONFIGURAZIONE GOOGLE DRIVE
+   Incolla qui il tuo OAuth Client ID (tipo "1234-abcd.apps.googleusercontent.com").
+   Finché resta vuoto, i pulsanti Drive mostrano le istruzioni. */
+const GOOGLE_CLIENT_ID = "";
+const DRIVE_FOLDER = "Lezioni Scuola";
+const DRIVE_FILE = "lezioni-backup.json";
 const EMPTY = () => ({id:null,titolo:"",concetto:"",fumetto:"",obiettivi:"",online:"",vivo:"",materiali:"",durata:""});
 
 let lezioni = [];
@@ -555,9 +568,41 @@ function caricaImmagine(e){
 document.getElementById("fileComic").addEventListener("change", caricaImmagine);
 document.getElementById("fileCamera").addEventListener("change", caricaImmagine);
 
-/* ── Backup / Ripristino ── */
-document.getElementById("btnExport").addEventListener("click", ()=>{
-  if(!lezioni.length){ alert("Non c'è ancora nessuna lezione da salvare."); return; }
+/* ── Toast ── */
+function toast(msg, isErr){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = "toast show" + (isErr?" err":"");
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.className="toast", 2600);
+}
+
+/* ── Unione dati importati (da file o da Drive) ── */
+function applyImported(data, sorgente){
+  if(!Array.isArray(data)){ toast("Backup non valido.", true); return; }
+  if(lezioni.length){
+    const unisci = confirm(
+      `Il backup ${sorgente} contiene ${data.length} lezioni.\n\n`+
+      `• OK = UNISCI: aggiunge/aggiorna senza cancellare le ${lezioni.length} lezioni attuali\n`+
+      `• Annulla = SOSTITUISCI tutto con il backup`);
+    if(unisci){
+      data.forEach(nuova=>{
+        if(nuova.id==null) nuova.id = Date.now()+Math.floor(Math.random()*1000);
+        const i = lezioni.findIndex(l=>l.id===nuova.id);
+        if(i>=0) lezioni[i]=nuova; else lezioni.push(nuova);
+      });
+    } else {
+      if(!confirm("Confermi di SOSTITUIRE tutte le lezioni attuali?")) return;
+      lezioni = data;
+    }
+  } else {
+    lezioni = data;
+  }
+  save(); view="lista"; render();
+  toast("Lezioni importate ✓");
+}
+
+/* ── Backup / Ripristino su FILE locale ── */
+function exportFile(){
+  if(!lezioni.length){ toast("Nessuna lezione da salvare.", true); return; }
   const blob = new Blob([JSON.stringify(lezioni,null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -565,42 +610,137 @@ document.getElementById("btnExport").addEventListener("click", ()=>{
   a.download = `lezioni-backup-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
-});
-document.getElementById("btnImport").addEventListener("click", ()=> document.getElementById("fileBackup").click());
+}
 document.getElementById("fileBackup").addEventListener("change", e=>{
   const file = e.target.files[0]; if(!file) return;
   const r = new FileReader();
-  r.onload = ()=>{
-    try{
-      const data = JSON.parse(r.result);
-      if(!Array.isArray(data)) throw new Error();
-      if(lezioni.length){
-        const unisci = confirm(
-          `Il backup contiene ${data.length} lezioni.\n\n`+
-          `• OK = UNISCI: aggiunge/aggiorna senza cancellare le ${lezioni.length} lezioni attuali\n`+
-          `• Annulla = SOSTITUISCI tutto con il backup`);
-        if(unisci){
-          data.forEach(nuova=>{
-            if(nuova.id==null) nuova.id = Date.now()+Math.floor(Math.random()*1000);
-            const i = lezioni.findIndex(l=>l.id===nuova.id);
-            if(i>=0) lezioni[i]=nuova; else lezioni.push(nuova);
-          });
-        } else {
-          if(!confirm("Confermi di SOSTITUIRE tutte le lezioni attuali?")) return;
-          lezioni = data;
-        }
-      } else {
-        lezioni = data;
-      }
-      save(); view="lista"; render();
-      alert("Backup importato con successo. ✓");
-    }catch(err){ alert("Il file non è un backup valido."); }
-  };
+  r.onload = ()=>{ try{ applyImported(JSON.parse(r.result), "del file"); }catch(err){ toast("Il file non è un backup valido.", true); } };
   r.readAsText(file);
   e.target.value="";
 });
 
-document.getElementById("btnNew").addEventListener("click", nuova);
+/* ──────────────── GOOGLE DRIVE ──────────────── */
+let driveToken = null, driveExp = 0, driveClient = null, driveOn = false;
+
+function driveConfigurato(){ return !!GOOGLE_CLIENT_ID; }
+
+function avvisoConfig(){
+  alert(
+    "Google Drive non è ancora configurato.\n\n"+
+    "1) Crea un OAuth Client ID (tipo Web) su https://console.cloud.google.com/apis/credentials\n"+
+    "2) Aggiungi l'indirizzo del sito tra le \"Origini JavaScript autorizzate\"\n"+
+    "3) Incolla il Client ID nella costante GOOGLE_CLIENT_ID dentro index.html\n\n"+
+    "Nota: il login Google funziona solo se la pagina è aperta da un indirizzo https, non come file locale.");
+}
+
+function withDrive(action){
+  if(!driveConfigurato()){ avvisoConfig(); return; }
+  if(!window.google || !google.accounts || !google.accounts.oauth2){ toast("Google non ancora caricato, riprova.", true); return; }
+  if(!driveClient){
+    driveClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: "https://www.googleapis.com/auth/drive.file",
+      callback: ()=>{}
+    });
+  }
+  if(driveToken && Date.now() < driveExp - 60000){ action(); return; }
+  driveClient.callback = (resp)=>{
+    if(resp.error){ toast("Accesso a Drive negato.", true); return; }
+    driveToken = resp.access_token;
+    driveExp = Date.now() + (resp.expires_in||3600)*1000;
+    driveOn = true; renderToolbar();
+    action();
+  };
+  driveClient.requestAccessToken({prompt: driveToken ? "" : "consent"});
+}
+
+async function driveFetch(url, opts){
+  const o = opts || {};
+  o.headers = Object.assign({Authorization:"Bearer "+driveToken}, o.headers||{});
+  const r = await fetch(url, o);
+  if(r.status===401){ driveToken=null; throw new Error("Sessione scaduta, riprova."); }
+  if(!r.ok) throw new Error("Errore Drive ("+r.status+")");
+  return r;
+}
+
+async function driveGetFolderId(){
+  const q = encodeURIComponent(`name='${DRIVE_FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+  const r = await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`);
+  const d = await r.json();
+  if(d.files && d.files.length) return d.files[0].id;
+  const r2 = await driveFetch("https://www.googleapis.com/drive/v3/files", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({name:DRIVE_FOLDER, mimeType:"application/vnd.google-apps.folder"})
+  });
+  return (await r2.json()).id;
+}
+
+async function driveFindFile(folderId){
+  const q = encodeURIComponent(`name='${DRIVE_FILE}' and '${folderId}' in parents and trashed=false`);
+  const r = await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`);
+  const d = await r.json();
+  return (d.files && d.files[0]) ? d.files[0].id : null;
+}
+
+function driveSave(){
+  withDrive(async ()=>{
+    try{
+      if(!lezioni.length){ toast("Nessuna lezione da salvare.", true); return; }
+      toast("Salvataggio su Drive…");
+      const folderId = await driveGetFolderId();
+      const fileId = await driveFindFile(folderId);
+      const meta = fileId ? {} : {name:DRIVE_FILE, parents:[folderId]};
+      const boundary = "lezbound" + Date.now();
+      const body =
+        `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
+        JSON.stringify(meta) +
+        `\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n` +
+        JSON.stringify(lezioni, null, 2) +
+        `\r\n--${boundary}--`;
+      const url = fileId
+        ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
+        : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
+      await driveFetch(url, {method: fileId?"PATCH":"POST", headers:{"Content-Type":`multipart/related; boundary=${boundary}`}, body});
+      toast(`Salvato su Drive · cartella "${DRIVE_FOLDER}" ✓`);
+    }catch(err){ toast(err.message||"Errore nel salvataggio su Drive.", true); }
+  });
+}
+
+function driveLoad(){
+  withDrive(async ()=>{
+    try{
+      toast("Lettura da Drive…");
+      const folderId = await driveGetFolderId();
+      const fileId = await driveFindFile(folderId);
+      if(!fileId){ toast(`Nessun backup trovato nella cartella "${DRIVE_FOLDER}".`, true); return; }
+      const r = await driveFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+      applyImported(await r.json(), "su Drive");
+    }catch(err){ toast(err.message||"Errore nella lettura da Drive.", true); }
+  });
+}
+
+/* ── Barra strumenti (dinamica in base allo stato Drive) ── */
+function renderToolbar(){
+  const tb = document.getElementById("toolbar");
+  const drive = driveOn
+    ? `<span class="drivechip">☁️ Drive collegato</span>
+       <button class="btn btn-ghost btn-sm" id="btnDriveSave">☁️ Salva su Drive</button>
+       <button class="btn btn-ghost btn-sm" id="btnDriveLoad">☁️ Carica da Drive</button>`
+    : `<button class="btn btn-ghost btn-sm" id="btnDriveConnect">☁️ Collega Google Drive</button>`;
+  tb.innerHTML =
+    drive +
+    `<button class="btn btn-ghost btn-sm iconbtn" id="btnExport" title="Backup su file">⬇️</button>
+     <button class="btn btn-ghost btn-sm iconbtn" id="btnImport" title="Ripristina da file">⬆️</button>
+     <button class="btn btn-primary btn-sm" id="btnNew">＋ Nuova lezione</button>`;
+  const on = (id, fn)=>{ const el=document.getElementById(id); if(el) el.onclick=fn; };
+  on("btnDriveConnect", ()=> withDrive(()=>toast("Google Drive collegato ✓")));
+  on("btnDriveSave", driveSave);
+  on("btnDriveLoad", driveLoad);
+  on("btnExport", exportFile);
+  on("btnImport", ()=> document.getElementById("fileBackup").click());
+  on("btnNew", nuova);
+}
+renderToolbar();
 
 /* ── Tastiera per le slide ── */
 document.addEventListener("keydown", e=>{
