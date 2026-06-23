@@ -1,0 +1,15 @@
+{
+  "name": "Le mie lezioni · Italiano e Lettura",
+  "short_name": "Lezioni",
+  "description": "Crea, organizza e presenta a slide le lezioni di italiano e lettura della scuola primaria.",
+  "lang": "it",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FAF6EF",
+  "theme_color": "#E07A5F",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
