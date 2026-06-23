@@ -214,57 +214,157 @@ const GOOGLE_CLIENT_ID = "182315572999-kslekgg21jq5lbdp5tkkebdqp3elp5ok.apps.goo
 const DRIVE_FOLDER = "Lezioni Scuola";
 const DRIVE_FILE = "lezioni-backup.json";
 const EMPTY = () => ({id:null,titolo:"",concetto:"",fumetto:"",obiettivi:"",online:"",vivo:"",materiali:"",durata:""});
+const EMPTY_CORSO = () => ({id:null,titolo:"",descrizione:"",lezioni:[]});
 
-let lezioni = [];
-let view = "lista";      // lista | edit | slide
-let draft = EMPTY();
+let corsi = [];          // sovrastruttura: ogni corso contiene le sue lezioni
+let currentCorsoId = null;
+let view = "corsi";      // corsi | corso | editCorso | edit | slide
+let draft = EMPTY();         // bozza lezione
+let draftCorso = EMPTY_CORSO(); // bozza corso
 let query = "";
 let slideIndex = 0;
 let editMode = false;    // modifica inline nelle slide
 
 function load(){
-  try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) lezioni = JSON.parse(raw); }
-  catch(e){ lezioni = []; }
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ corsi = []; return; }
+    const data = JSON.parse(raw);
+    if(Array.isArray(data)){
+      // formato vecchio (solo lezioni) → migra dentro un corso predefinito
+      corsi = data.length ? [{id:Date.now(), titolo:"Le mie lezioni", descrizione:"", lezioni:data}] : [];
+    } else if(data && Array.isArray(data.corsi)){
+      corsi = data.corsi;
+    } else {
+      corsi = [];
+    }
+  }
+  catch(e){ corsi = []; }
 }
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(lezioni)); }
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({corsi})); }
+function corsoCorrente(){ return corsi.find(c=>c.id===currentCorsoId) || null; }
+function lezioniCorrenti(){ const c=corsoCorrente(); return c ? (c.lezioni||(c.lezioni=[])) : []; }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function lines(s){ return (s||"").split("\n").map(x=>x.replace(/^[\s•\-–·]+/,"").trim()).filter(Boolean); }
 
 const app = document.getElementById("app");
 
 function render(){
-  if(view==="lista") renderLista();
+  if(view==="corsi") renderCorsi();
+  else if(view==="corso") renderCorso();
+  else if(view==="editCorso") renderEditorCorso();
   else if(view==="edit") renderEditor();
   else renderSlides();
 }
 
-/* ───────────────────────── LISTA ───────────────────────── */
-function renderLista(){
-  if(lezioni.length===0){
+/* ───────────────────────── CORSI (home) ───────────────────────── */
+function renderCorsi(){
+  if(corsi.length===0){
     app.innerHTML = `
       <div class="empty-state">
-        <div style="font-size:50px;margin-bottom:10px">📚</div>
-        <h2 style="font-family:var(--display);font-weight:600;margin:0 0 6px">Ancora nessuna lezione</h2>
-        <p style="color:var(--muted);margin:0 0 20px">Crea la prima lezione: potrai vederla come una presentazione a slide.</p>
-        <button class="btn btn-primary" onclick="nuova()">＋ Crea la prima lezione</button>
+        <div style="font-size:50px;margin-bottom:10px">🎓</div>
+        <h2 style="font-family:var(--display);font-weight:600;margin:0 0 6px">Ancora nessun corso</h2>
+        <p style="color:var(--muted);margin:0 0 20px">Crea il primo corso: raccoglierà al suo interno tutte le lezioni.</p>
+        <button class="btn btn-primary" onclick="nuovoCorso()">＋ Crea il primo corso</button>
       </div>`;
     return;
   }
-  const filt = lezioni.filter(l =>
-    (l.titolo||"").toLowerCase().includes(query.toLowerCase()) ||
-    (l.concetto||"").toLowerCase().includes(query.toLowerCase()));
+  const filt = corsi.filter(c =>
+    (c.titolo||"").toLowerCase().includes(query.toLowerCase()) ||
+    (c.descrizione||"").toLowerCase().includes(query.toLowerCase()));
 
   app.innerHTML = `
     <div class="search no-print">
       <span>🔍</span>
-      <input id="q" placeholder="Cerca per titolo o concetto…" value="${esc(query)}">
+      <input id="q" placeholder="Cerca un corso…" value="${esc(query)}">
     </div>
     <div class="grid">
-      ${filt.map(cardHTML).join("") || `<p style="color:var(--muted)">Nessuna lezione trovata.</p>`}
+      ${filt.map(corsoCardHTML).join("") || `<p style="color:var(--muted)">Nessun corso trovato.</p>`}
     </div>`;
 
   const q = document.getElementById("q");
-  q.addEventListener("input", e => { query = e.target.value; const p=q.selectionStart; renderLista(); const nq=document.getElementById("q"); nq.focus(); nq.setSelectionRange(p,p); });
+  q.addEventListener("input", e => { query = e.target.value; const p=q.selectionStart; renderCorsi(); const nq=document.getElementById("q"); nq.focus(); nq.setSelectionRange(p,p); });
+}
+
+function corsoCardHTML(c){
+  const n = (c.lezioni||[]).length;
+  return `
+  <article class="card lezcard">
+    <div class="lez-body">
+      <h3>🎓 ${esc(c.titolo)}</h3>
+      ${c.descrizione?`<p class="concetto" style="font-weight:700;color:var(--muted);text-transform:none">${esc(c.descrizione)}</p>`:`<p class="concetto" style="font-weight:700;color:var(--muted);opacity:.7">Nessuna descrizione</p>`}
+      <div class="pills">
+        <span class="pill indigo">📚 ${n} ${n===1?"lezione":"lezioni"}</span>
+      </div>
+      <div class="actions no-print">
+        <button class="btn btn-primary btn-sm" onclick="apriCorso(${c.id})">📂 Apri corso</button>
+        <button class="btn btn-ghost btn-sm" onclick="modificaCorso(${c.id})">✏️ Modifica</button>
+        <button class="btn btn-ghost btn-sm danger" onclick="eliminaCorso(${c.id})">🗑️</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+/* ───────────────────────── CORSO (dettaglio + lezioni) ───────────────────────── */
+function renderCorso(){
+  const c = corsoCorrente();
+  if(!c){ view="corsi"; renderCorsi(); return; }
+  const lez = c.lezioni||[];
+  const filt = lez.filter(l =>
+    (l.titolo||"").toLowerCase().includes(query.toLowerCase()) ||
+    (l.concetto||"").toLowerCase().includes(query.toLowerCase()));
+
+  app.innerHTML = `
+    <button class="btn btn-ghost btn-sm no-print" onclick="tornaCorsi()" style="margin-bottom:16px">‹ Tutti i corsi</button>
+    <div class="card" style="margin-bottom:22px">
+      <h2 style="font-family:var(--display);font-weight:700;font-size:26px;margin:0 0 8px">🎓 ${esc(c.titolo)}</h2>
+      ${c.descrizione
+        ? `<p style="margin:0;color:var(--ink);font-size:16px;line-height:1.55;font-weight:600">${esc(c.descrizione)}</p>`
+        : `<p style="margin:0;color:var(--muted);font-style:italic">Questo corso non ha ancora una descrizione dello scopo. <button class="btn btn-ghost btn-sm" onclick="modificaCorso(${c.id})">✏️ Aggiungi descrizione</button></p>`}
+      <div class="actions no-print" style="margin-top:16px">
+        <button class="btn btn-primary btn-sm" onclick="nuova()">＋ Nuova lezione</button>
+        <button class="btn btn-ghost btn-sm" onclick="modificaCorso(${c.id})">✏️ Modifica corso</button>
+      </div>
+    </div>
+    ${lez.length===0
+      ? `<div class="empty-state">
+           <div style="font-size:50px;margin-bottom:10px">📚</div>
+           <h2 style="font-family:var(--display);font-weight:600;margin:0 0 6px">Ancora nessuna lezione</h2>
+           <p style="color:var(--muted);margin:0 0 20px">Aggiungi la prima lezione di questo corso: potrai vederla come una presentazione a slide.</p>
+           <button class="btn btn-primary" onclick="nuova()">＋ Crea la prima lezione</button>
+         </div>`
+      : `<div class="search no-print">
+           <span>🔍</span>
+           <input id="q" placeholder="Cerca per titolo o concetto…" value="${esc(query)}">
+         </div>
+         <div class="grid">
+           ${filt.map(cardHTML).join("") || `<p style="color:var(--muted)">Nessuna lezione trovata.</p>`}
+         </div>`}`;
+
+  const q = document.getElementById("q");
+  if(q) q.addEventListener("input", e => { query = e.target.value; const p=q.selectionStart; renderCorso(); const nq=document.getElementById("q"); if(nq){ nq.focus(); nq.setSelectionRange(p,p); } });
+}
+
+/* ───────────────────────── EDITOR CORSO ───────────────────────── */
+function renderEditorCorso(){
+  app.innerHTML = `
+    <button class="btn btn-ghost btn-sm no-print" onclick="annullaCorso()" style="margin-bottom:16px">‹ Torna ai corsi</button>
+    <div class="card">
+      <div class="fieldblock">
+        <label class="field">🎓 Titolo del corso</label>
+        <input id="c_titolo" value="${esc(draftCorso.titolo)}" placeholder="Es. Piccoli filosofi">
+      </div>
+      <div class="fieldblock">
+        <label class="field">📝 Descrizione dello scopo del corso</label>
+        <textarea id="c_descrizione" rows="4" placeholder="A cosa serve questo corso? Cosa imparano i bambini?">${esc(draftCorso.descrizione)}</textarea>
+      </div>
+      <div class="actions no-print" style="margin-top:6px">
+        <button class="btn btn-primary" onclick="salvaCorso()">💾 Salva corso</button>
+        <button class="btn btn-ghost" onclick="annullaCorso()">Annulla</button>
+      </div>
+    </div>`;
+  document.getElementById("c_titolo").addEventListener("input", e=>{ draftCorso.titolo=e.target.value; });
+  document.getElementById("c_descrizione").addEventListener("input", e=>{ draftCorso.descrizione=e.target.value; });
 }
 
 function cardHTML(l){
@@ -509,9 +609,11 @@ function persist(){
   if(chip){ chip.classList.add("show"); clearTimeout(persist._t); persist._t=setTimeout(()=>chip.classList.remove("show"),1100); }
 }
 function upsert(){
+  const c = corsoCorrente(); if(!c) return;
+  if(!c.lezioni) c.lezioni = [];
   if(draft.id==null) draft.id = Date.now();
-  const i = lezioni.findIndex(l=>l.id===draft.id);
-  if(i>=0) lezioni[i]=JSON.parse(JSON.stringify(draft)); else lezioni.push(JSON.parse(JSON.stringify(draft)));
+  const i = c.lezioni.findIndex(l=>l.id===draft.id);
+  if(i>=0) c.lezioni[i]=JSON.parse(JSON.stringify(draft)); else c.lezioni.push(JSON.parse(JSON.stringify(draft)));
   save();
 }
 
@@ -536,11 +638,45 @@ function stampaTutto(){
   editMode=wasEdit; renderSlides();
 }
 
-/* ───────────────────────── AZIONI ───────────────────────── */
+/* ───────────────────────── AZIONI CORSO ───────────────────────── */
+function nuovoCorso(){ draftCorso = EMPTY_CORSO(); draftCorso.id = Date.now(); view="editCorso"; render(); }
+function modificaCorso(id){ draftCorso = JSON.parse(JSON.stringify(corsi.find(c=>c.id===id))); view="editCorso"; render(); }
+function apriCorso(id){ currentCorsoId = id; view="corso"; query=""; render(); }
+function tornaCorsi(){ view="corsi"; currentCorsoId=null; query=""; render(); }
+function annullaCorso(){
+  // se il corso è già salvato torna al suo dettaglio, altrimenti alla lista corsi
+  if(draftCorso.id!=null && corsi.some(c=>c.id===draftCorso.id)){ currentCorsoId=draftCorso.id; view="corso"; }
+  else view="corsi";
+  query=""; render();
+}
+function upsertCorso(){
+  if(draftCorso.id==null) draftCorso.id = Date.now();
+  if(!draftCorso.lezioni) draftCorso.lezioni = [];
+  const i = corsi.findIndex(c=>c.id===draftCorso.id);
+  if(i>=0){ // preserva le lezioni esistenti
+    draftCorso.lezioni = corsi[i].lezioni || [];
+    corsi[i] = JSON.parse(JSON.stringify(draftCorso));
+  } else corsi.push(JSON.parse(JSON.stringify(draftCorso)));
+  save();
+}
+function salvaCorso(){
+  if(!draftCorso.titolo.trim()){ alert("Dai un titolo al corso prima di salvare."); return; }
+  upsertCorso();
+  currentCorsoId = draftCorso.id; view="corso"; query=""; render();
+}
+function eliminaCorso(id){
+  const c = corsi.find(x=>x.id===id); const n = c ? (c.lezioni||[]).length : 0;
+  if(!confirm(`Eliminare il corso "${c?c.titolo:""}"${n?` e le sue ${n} lezioni`:""}? L'azione non è reversibile.`)) return;
+  corsi = corsi.filter(x=>x.id!==id); save();
+  if(currentCorsoId===id){ currentCorsoId=null; view="corsi"; }
+  render();
+}
+
+/* ───────────────────────── AZIONI LEZIONE ───────────────────────── */
 function nuova(){ draft = EMPTY(); draft.id = Date.now(); view="edit"; render(); }
-function modifica(id){ draft = JSON.parse(JSON.stringify(lezioni.find(l=>l.id===id))); view="edit"; editMode=false; render(); }
-function presenta(id){ draft = JSON.parse(JSON.stringify(lezioni.find(l=>l.id===id))); view="slide"; slideIndex=0; editMode=false; render(); }
-function annulla(){ view="lista"; editMode=false; draft=EMPTY(); render(); }
+function modifica(id){ draft = JSON.parse(JSON.stringify(lezioniCorrenti().find(l=>l.id===id))); view="edit"; editMode=false; render(); }
+function presenta(id){ draft = JSON.parse(JSON.stringify(lezioniCorrenti().find(l=>l.id===id))); view="slide"; slideIndex=0; editMode=false; render(); }
+function annulla(){ view="corso"; editMode=false; draft=EMPTY(); render(); }
 function rimuoviFumetto(){ draft.fumetto=""; renderComicArea(); }
 
 function salvaEditor(){
@@ -550,7 +686,8 @@ function salvaEditor(){
 }
 function elimina(id){
   if(!confirm("Eliminare questa lezione? L'azione non è reversibile.")) return;
-  lezioni = lezioni.filter(l=>l.id!==id); save(); render();
+  const c = corsoCorrente(); if(c){ c.lezioni = (c.lezioni||[]).filter(l=>l.id!==id); save(); }
+  render();
 }
 
 /* ── Caricamento immagine (galleria o fotocamera) ── */
@@ -577,33 +714,41 @@ function toast(msg, isErr){
 
 /* ── Unione dati importati (da file o da Drive) ── */
 function applyImported(data, sorgente){
-  if(!Array.isArray(data)){ toast("Backup non valido.", true); return; }
-  if(lezioni.length){
+  // normalizza in lista di corsi (accetta sia il nuovo formato {corsi:[]} sia il vecchio array di lezioni)
+  let nuoviCorsi;
+  if(Array.isArray(data)){
+    nuoviCorsi = data.length ? [{id:Date.now(), titolo:"Lezioni importate", descrizione:"", lezioni:data}] : [];
+  } else if(data && Array.isArray(data.corsi)){
+    nuoviCorsi = data.corsi;
+  } else { toast("Backup non valido.", true); return; }
+
+  if(corsi.length){
     const unisci = confirm(
-      `Il backup ${sorgente} contiene ${data.length} lezioni.\n\n`+
-      `• OK = UNISCI: aggiunge/aggiorna senza cancellare le ${lezioni.length} lezioni attuali\n`+
+      `Il backup ${sorgente} contiene ${nuoviCorsi.length} corsi.\n\n`+
+      `• OK = UNISCI: aggiunge/aggiorna senza cancellare i ${corsi.length} corsi attuali\n`+
       `• Annulla = SOSTITUISCI tutto con il backup`);
     if(unisci){
-      data.forEach(nuova=>{
-        if(nuova.id==null) nuova.id = Date.now()+Math.floor(Math.random()*1000);
-        const i = lezioni.findIndex(l=>l.id===nuova.id);
-        if(i>=0) lezioni[i]=nuova; else lezioni.push(nuova);
+      nuoviCorsi.forEach(nc=>{
+        if(nc.id==null) nc.id = Date.now()+Math.floor(Math.random()*1000);
+        if(!nc.lezioni) nc.lezioni = [];
+        const i = corsi.findIndex(c=>c.id===nc.id);
+        if(i>=0) corsi[i]=nc; else corsi.push(nc);
       });
     } else {
-      if(!confirm("Confermi di SOSTITUIRE tutte le lezioni attuali?")) return;
-      lezioni = data;
+      if(!confirm("Confermi di SOSTITUIRE tutti i corsi attuali?")) return;
+      corsi = nuoviCorsi;
     }
   } else {
-    lezioni = data;
+    corsi = nuoviCorsi;
   }
-  save(); view="lista"; render();
-  toast("Lezioni importate ✓");
+  save(); view="corsi"; currentCorsoId=null; query=""; render();
+  toast("Corsi importati ✓");
 }
 
 /* ── Backup / Ripristino su FILE locale ── */
 function exportFile(){
-  if(!lezioni.length){ toast("Nessuna lezione da salvare.", true); return; }
-  const blob = new Blob([JSON.stringify(lezioni,null,2)], {type:"application/json"});
+  if(!corsi.length){ toast("Nessun corso da salvare.", true); return; }
+  const blob = new Blob([JSON.stringify({corsi},null,2)], {type:"application/json"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   const d = new Date(), p = n=>String(n).padStart(2,"0");
@@ -685,7 +830,7 @@ async function driveFindFile(folderId){
 function driveSave(){
   withDrive(async ()=>{
     try{
-      if(!lezioni.length){ toast("Nessuna lezione da salvare.", true); return; }
+      if(!corsi.length){ toast("Nessun corso da salvare.", true); return; }
       toast("Salvataggio su Drive…");
       const folderId = await driveGetFolderId();
       const fileId = await driveFindFile(folderId);
@@ -695,7 +840,7 @@ function driveSave(){
         `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
         JSON.stringify(meta) +
         `\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n` +
-        JSON.stringify(lezioni, null, 2) +
+        JSON.stringify({corsi}, null, 2) +
         `\r\n--${boundary}--`;
       const url = fileId
         ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
@@ -731,14 +876,14 @@ function renderToolbar(){
     drive +
     `<button class="btn btn-ghost btn-sm iconbtn" id="btnExport" title="Backup su file">⬇️</button>
      <button class="btn btn-ghost btn-sm iconbtn" id="btnImport" title="Ripristina da file">⬆️</button>
-     <button class="btn btn-primary btn-sm" id="btnNew">＋ Nuova lezione</button>`;
+     <button class="btn btn-primary btn-sm" id="btnNew">＋ Nuovo corso</button>`;
   const on = (id, fn)=>{ const el=document.getElementById(id); if(el) el.onclick=fn; };
   on("btnDriveConnect", ()=> withDrive(()=>toast("Google Drive collegato ✓")));
   on("btnDriveSave", driveSave);
   on("btnDriveLoad", driveLoad);
   on("btnExport", exportFile);
   on("btnImport", ()=> document.getElementById("fileBackup").click());
-  on("btnNew", nuova);
+  on("btnNew", nuovoCorso);
 }
 renderToolbar();
 
