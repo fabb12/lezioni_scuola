@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le mie lezioni · Italiano e Lettura</title>
+<meta name="theme-color" content="#E07A5F">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -16,6 +19,14 @@
     --display:'Fredoka',system-ui,sans-serif;
     --body:'Nunito',system-ui,sans-serif;
     --radius:20px;
+    --scale:1;
+  }
+  /* ── Tema scuro ── */
+  html[data-theme="dark"]{
+    --paper:#1d1c1a; --ink:#ECE7DC; --line:#3a3833; --muted:#9c968a;
+    --card:#26241f;
+    --shadow:0 14px 34px -16px rgba(0,0,0,.7);
+    --shadow-sm:0 6px 18px -10px rgba(0,0,0,.6);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -28,6 +39,12 @@
     background-attachment:fixed;
     min-height:100%;
   }
+  html[data-theme="dark"] body{
+    background:
+      radial-gradient(900px 500px at 10% -10%, #2a211c 0%, transparent 55%),
+      radial-gradient(900px 600px at 100% 0%, #16241d 0%, transparent 50%),
+      linear-gradient(180deg,#1d1c1a 0%, #161512 100%);
+  }
   button{font-family:var(--body);cursor:pointer}
 
   /* ── Header ── */
@@ -36,6 +53,7 @@
     background:rgba(250,246,239,.82);backdrop-filter:blur(12px);
     border-bottom:1px solid var(--line);
   }
+  html[data-theme="dark"] header{background:rgba(29,28,26,.85)}
   .wrap{max-width:1040px;margin:0 auto;padding:14px 22px}
   .head-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .logo{
@@ -47,7 +65,7 @@
   .sub{margin:3px 0 0;font-size:13px;color:var(--muted);font-weight:600}
   .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-left:auto}
 
-  main{max-width:1040px;margin:0 auto;padding:28px 22px 90px}
+  main{max-width:1040px;margin:0 auto;padding:28px 22px 90px;zoom:var(--scale,1)}
 
   /* ── Buttons ── */
   .btn{
@@ -55,11 +73,14 @@
     font-weight:800;font-size:14px;transition:transform .12s ease, box-shadow .18s ease, background .18s ease;
     background:#fff;color:var(--ink);box-shadow:var(--shadow-sm);
   }
+  html[data-theme="dark"] .btn{background:var(--card)}
   .btn:hover{transform:translateY(-2px)}
   .btn:active{transform:translateY(0)}
   .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 12px 22px -10px rgba(224,122,95,.85)}
   .btn-ghost{background:rgba(255,255,255,.7);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+  html[data-theme="dark"] .btn-ghost{background:rgba(255,255,255,.06)}
   .btn-ghost:hover{background:#fff;box-shadow:var(--shadow-sm)}
+  html[data-theme="dark"] .btn-ghost:hover{background:rgba(255,255,255,.12)}
   .btn-ghost.danger{color:var(--accentDk)}
   .btn-sm{padding:8px 13px;font-size:13px;border-radius:11px}
 
@@ -71,17 +92,20 @@
     font-size:15px;font-family:var(--body);background:#FCFAF5;outline:none;color:var(--ink);
     transition:border-color .15s ease, box-shadow .15s ease;
   }
+  html[data-theme="dark"] input,html[data-theme="dark"] textarea{background:#201e1a}
   input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(224,122,95,.14)}
   textarea{resize:vertical;line-height:1.55}
   label.field{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13px;margin-bottom:7px}
   .fieldblock{margin-bottom:18px}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 
   /* ── Search ── */
   .search{position:relative;margin-bottom:22px;max-width:480px}
   .search input{padding-left:44px;border-radius:14px;background:#fff;box-shadow:var(--shadow-sm);border-color:transparent}
+  html[data-theme="dark"] .search input{background:var(--card)}
   .search span{position:absolute;left:15px;top:12px;color:var(--muted)}
+  .section-title{font-family:var(--display);font-weight:600;font-size:18px;margin:26px 0 14px;color:var(--ink)}
 
   /* ── Lesson list cards ── */
   .lez{display:flex;gap:18px;flex-wrap:wrap}
@@ -90,6 +114,7 @@
   .thumb{width:172px;flex-shrink:0}
   .thumb img{width:100%;border-radius:14px;display:block;box-shadow:var(--shadow-sm)}
   .thumb .empty{width:100%;aspect-ratio:3/2;border-radius:14px;border:2px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:12px;text-align:center;padding:8px;background:#FCFAF5}
+  html[data-theme="dark"] .thumb .empty{background:#201e1a}
   .lez-body{flex:1;min-width:230px}
   .lez-body h3{font-family:var(--display);font-size:21px;margin:0 0 4px;font-weight:600}
   .concetto{margin:0 0 12px;color:var(--accentDk);font-weight:800;font-size:14px}
@@ -98,20 +123,41 @@
   .pill.mint{background:#CFF0DC;color:#0c6e43}
   .pill.amber{background:#FCE9B6;color:#92600b}
   .pill.indigo{background:#DCE0FB;color:#3b3da8}
+  .pill.tag{background:#EDE9FE;color:#5b21b6}
+  .stat{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;font-size:13px;font-weight:800;background:var(--line);color:var(--ink)}
 
   .imgpick{display:flex;gap:10px;flex-wrap:wrap}
+  .ord{display:inline-flex;gap:4px;margin-left:auto}
+
+  /* ── Gallery (immagini multiple) ── */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:18px}
+  .gallery img{width:100%;border-radius:14px;box-shadow:var(--shadow-sm);object-fit:cover;aspect-ratio:4/3;display:block}
+  .gallery-edit{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+  .gallery-edit .gi{position:relative;width:120px}
+  .gallery-edit .gi img{width:100%;border-radius:12px;box-shadow:var(--shadow-sm);display:block;aspect-ratio:4/3;object-fit:cover}
+  .gallery-edit .gi-x{position:absolute;top:-8px;right:-8px;width:26px;height:26px;border-radius:50%;border:0;background:var(--accentDk);color:#fff;font-weight:900;box-shadow:var(--shadow-sm);font-size:13px}
 
   /* ── Drive ── */
   .drivechip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:#0c6e43;background:#CFF0DC;padding:7px 11px;border-radius:11px}
   .iconbtn{padding:8px 11px;font-size:14px}
-  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-weight:800;font-size:14px;padding:12px 20px;border-radius:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;z-index:50}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-weight:800;font-size:14px;padding:12px 20px;border-radius:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;z-index:50;max-width:90vw;text-align:center}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .toast.err{background:var(--accentDk)}
 
   .empty-state{text-align:center;margin-top:48px;padding:54px 22px;border:2px dashed var(--line);border-radius:24px;background:rgba(255,255,255,.6)}
+  html[data-theme="dark"] .empty-state{background:rgba(255,255,255,.04)}
 
   .hidden{display:none}
   .no-print{}
+
+  /* ── Timer in classe ── */
+  .timerbox{position:fixed;right:18px;bottom:18px;z-index:60;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:14px 16px;text-align:center;min-width:160px}
+  .timerbox .t-disp{font-family:var(--display);font-weight:700;font-size:40px;line-height:1;color:var(--ink)}
+  .timerbox .t-disp.warn{color:var(--accentDk);animation:tpulse .6s infinite alternate}
+  @keyframes tpulse{to{opacity:.45}}
+  .timerbox .t-row{display:flex;gap:6px;justify-content:center;margin-top:10px}
+  .timerbox .t-row button{border:0;background:var(--line);color:var(--ink);border-radius:9px;padding:7px 9px;font-weight:800;font-size:13px;cursor:pointer}
+  .timerbox .t-row button:hover{background:var(--accent);color:#fff}
 
   /* ── Slide presentation ── */
   .stage-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
@@ -137,6 +183,7 @@
   .points li .dot{flex-shrink:0;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;color:#fff;font-weight:900;margin-top:1px}
   .slide .cover-img{margin-top:22px;max-width:min(100%,420px);border-radius:18px;box-shadow:var(--shadow);display:block}
   .slide .num{position:absolute;top:22px;right:26px;font-weight:900;font-size:14px;opacity:.55}
+  .slide *{color:#2B2A26}
 
   /* slide themes (soft pastel gradients, dark ink) */
   .t-cover{background:linear-gradient(135deg,#FFE8D6,#FFCBB0)}
@@ -149,6 +196,10 @@
   .t-vivo .dot{background:#4F46E5}
   .t-mat{background:linear-gradient(135deg,#FCE3F0,#FBCFE8)}
   .t-mat .dot{background:#DB2777}
+  .t-compiti{background:linear-gradient(135deg,#FFE0CC,#FFD0B0)}
+  .t-compiti .dot{background:#C2410C}
+  .t-verifica{background:linear-gradient(135deg,#D9F0E4,#B6E7CC)}
+  .t-verifica .dot{background:#047857}
 
   /* inline editing on slides */
   .edit-on [contenteditable]{outline:none;border-radius:10px;transition:background .15s, box-shadow .15s}
@@ -163,10 +214,17 @@
   /* slide controls */
   .controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:18px}
   .nav-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:#fff;box-shadow:var(--shadow-sm);border:0}
+  html[data-theme="dark"] .nav-btn{background:var(--card);color:var(--ink)}
   .nav-btn:disabled{opacity:.35;cursor:default;transform:none}
   .dots{display:flex;gap:8px}
   .dots .d{width:10px;height:10px;border-radius:50%;background:var(--line);border:0;padding:0;transition:transform .15s, background .15s}
   .dots .d.active{background:var(--accent);transform:scale(1.35)}
+
+  /* fullscreen presentation */
+  .stage:fullscreen{background:var(--paper);padding:24px;display:flex;align-items:center;justify-content:center}
+  .stage:-webkit-full-screen{background:var(--paper);padding:24px;display:flex;align-items:center;justify-content:center}
+  .stage:fullscreen .slide{width:100%;min-height:90vh}
+  .stage:-webkit-full-screen .slide{width:100%;min-height:90vh}
 
   @media(max-width:560px){
     .two{grid-template-columns:1fr}
@@ -176,9 +234,9 @@
 
   /* ── Print: tutte le slide impilate ── */
   @media print{
-    header,.no-print,.controls,.stage-top{display:none!important}
+    header,.no-print,.controls,.stage-top,.timerbox{display:none!important}
     body{background:#fff}
-    main{padding:0;max-width:none}
+    main{padding:0;max-width:none;zoom:1}
     .slide{box-shadow:none;page-break-after:always;min-height:auto;border:1px solid #ddd;margin-bottom:12px;animation:none}
     .printall .slide{display:flex!important}
   }
@@ -202,10 +260,12 @@
 <input type="file" id="fileCamera" accept="image/*" capture="environment" class="hidden">
 <input type="file" id="fileBackup" accept="application/json,.json" class="hidden">
 
+<div class="timerbox hidden no-print" id="timerbox"></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const STORAGE_KEY = "lezioni-italiano-v1";
+const PREF_KEY = "lezioni-pref-v1";
 
 /* ⚙️ CONFIGURAZIONE GOOGLE DRIVE
    Incolla qui il tuo OAuth Client ID (tipo "1234-abcd.apps.googleusercontent.com").
@@ -213,7 +273,7 @@ const STORAGE_KEY = "lezioni-italiano-v1";
 const GOOGLE_CLIENT_ID = "182315572999-kslekgg21jq5lbdp5tkkebdqp3elp5ok.apps.googleusercontent.com";
 const DRIVE_FOLDER = "Lezioni Scuola";
 const DRIVE_FILE = "lezioni-backup.json";
-const EMPTY = () => ({id:null,titolo:"",concetto:"",fumetto:"",obiettivi:"",online:"",vivo:"",materiali:"",durata:""});
+const EMPTY = () => ({id:null,titolo:"",concetto:"",fumetto:"",immagini:[],obiettivi:"",online:"",vivo:"",materiali:"",compiti:"",verifica:"",tags:"",durata:""});
 const EMPTY_CORSO = () => ({id:null,titolo:"",descrizione:"",lezioni:[]});
 
 let corsi = [];          // sovrastruttura: ogni corso contiene le sue lezioni
@@ -225,27 +285,54 @@ let query = "";
 let slideIndex = 0;
 let editMode = false;    // modifica inline nelle slide
 
+/* preferenze utente (tema, dimensione testo, auto-sync) */
+let pref = {theme:"light", scale:1, autoSync:false};
+
 function load(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw){ corsi = []; return; }
-    const data = JSON.parse(raw);
-    if(Array.isArray(data)){
-      // formato vecchio (solo lezioni) → migra dentro un corso predefinito
-      corsi = data.length ? [{id:Date.now(), titolo:"Le mie lezioni", descrizione:"", lezioni:data}] : [];
-    } else if(data && Array.isArray(data.corsi)){
-      corsi = data.corsi;
-    } else {
-      corsi = [];
+    if(!raw){ corsi = []; }
+    else {
+      const data = JSON.parse(raw);
+      if(Array.isArray(data)){
+        // formato vecchio (solo lezioni) → migra dentro un corso predefinito
+        corsi = data.length ? [{id:Date.now(), titolo:"Le mie lezioni", descrizione:"", lezioni:data}] : [];
+      } else if(data && Array.isArray(data.corsi)){
+        corsi = data.corsi;
+      } else {
+        corsi = [];
+      }
     }
   }
   catch(e){ corsi = []; }
+  normalizeAll();
 }
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify({corsi})); }
+function normLez(l){
+  if(!l) return l;
+  if(!Array.isArray(l.immagini)) l.immagini = l.fumetto ? [l.fumetto] : [];
+  if(l.fumetto && !l.immagini.includes(l.fumetto)) l.immagini.unshift(l.fumetto);
+  ["titolo","concetto","obiettivi","online","vivo","materiali","compiti","verifica","tags","durata"].forEach(k=>{ if(l[k]==null) l[k]=""; });
+  l.fumetto = l.immagini[0] || "";
+  return l;
+}
+function normalizeAll(){
+  corsi.forEach(c=>{ if(!Array.isArray(c.lezioni)) c.lezioni=[]; c.lezioni.forEach(normLez); });
+}
+function save(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({corsi}));
+  }catch(e){
+    toast("⚠️ Spazio del browser esaurito. Esporta un backup e rimuovi qualche immagine.", true);
+    return;
+  }
+  if(driveOn && pref.autoSync) scheduleSync();
+}
 function corsoCorrente(){ return corsi.find(c=>c.id===currentCorsoId) || null; }
 function lezioniCorrenti(){ const c=corsoCorrente(); return c ? (c.lezioni||(c.lezioni=[])) : []; }
 function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function lines(s){ return (s||"").split("\n").map(x=>x.replace(/^[\s•\-–·]+/,"").trim()).filter(Boolean); }
+function tagList(s){ return (s||"").split(",").map(x=>x.trim()).filter(Boolean); }
+function parseMinutes(s){ const m=(s||"").match(/\d+/); return m?parseInt(m[0],10):0; }
 
 const app = document.getElementById("app");
 
@@ -269,37 +356,86 @@ function renderCorsi(){
       </div>`;
     return;
   }
+  const ql = query.toLowerCase();
   const filt = corsi.filter(c =>
-    (c.titolo||"").toLowerCase().includes(query.toLowerCase()) ||
-    (c.descrizione||"").toLowerCase().includes(query.toLowerCase()));
+    (c.titolo||"").toLowerCase().includes(ql) ||
+    (c.descrizione||"").toLowerCase().includes(ql));
+
+  // Ricerca globale: lezioni che corrispondono in tutti i corsi
+  let lezMatches = [];
+  if(ql){
+    corsi.forEach(c=>(c.lezioni||[]).forEach(l=>{
+      if((l.titolo||"").toLowerCase().includes(ql) ||
+         (l.concetto||"").toLowerCase().includes(ql) ||
+         (l.tags||"").toLowerCase().includes(ql))
+        lezMatches.push({c, l});
+    }));
+  }
 
   app.innerHTML = `
     <div class="search no-print">
       <span>🔍</span>
-      <input id="q" placeholder="Cerca un corso…" value="${esc(query)}">
+      <input id="q" placeholder="Cerca corsi e lezioni…" value="${esc(query)}">
     </div>
     <div class="grid">
-      ${filt.map(corsoCardHTML).join("") || `<p style="color:var(--muted)">Nessun corso trovato.</p>`}
-    </div>`;
+      ${filt.map((c,i)=>corsoCardHTML(c,i)).join("") || `<p style="color:var(--muted)">Nessun corso trovato.</p>`}
+    </div>
+    ${lezMatches.length ? `
+      <h3 class="section-title">📚 Lezioni trovate (${lezMatches.length})</h3>
+      <div class="grid">
+        ${lezMatches.map(m=>lezMatchHTML(m.c,m.l)).join("")}
+      </div>` : ""}`;
 
   const q = document.getElementById("q");
   q.addEventListener("input", e => { query = e.target.value; const p=q.selectionStart; renderCorsi(); const nq=document.getElementById("q"); nq.focus(); nq.setSelectionRange(p,p); });
 }
 
-function corsoCardHTML(c){
+function corsoCardHTML(c,i){
   const n = (c.lezioni||[]).length;
+  const tot = (c.lezioni||[]).reduce((a,l)=>a+parseMinutes(l.durata),0);
   return `
   <article class="card lezcard">
     <div class="lez-body">
-      <h3>🎓 ${esc(c.titolo)}</h3>
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <h3 style="flex:1">🎓 ${esc(c.titolo)}</h3>
+        <span class="ord no-print">
+          <button class="btn btn-ghost btn-sm iconbtn" title="Sposta su" onclick="spostaCorso(${c.id},-1)" ${i===0?'disabled style="opacity:.35"':''}>↑</button>
+          <button class="btn btn-ghost btn-sm iconbtn" title="Sposta giù" onclick="spostaCorso(${c.id},1)">↓</button>
+        </span>
+      </div>
       ${c.descrizione?`<p class="concetto" style="font-weight:700;color:var(--muted);text-transform:none">${esc(c.descrizione)}</p>`:`<p class="concetto" style="font-weight:700;color:var(--muted);opacity:.7">Nessuna descrizione</p>`}
       <div class="pills">
         <span class="pill indigo">📚 ${n} ${n===1?"lezione":"lezioni"}</span>
+        ${tot?`<span class="pill">⏱️ ${tot} min</span>`:""}
       </div>
       <div class="actions no-print">
         <button class="btn btn-primary btn-sm" onclick="apriCorso(${c.id})">📂 Apri corso</button>
         <button class="btn btn-ghost btn-sm" onclick="modificaCorso(${c.id})">✏️ Modifica</button>
+        <button class="btn btn-ghost btn-sm" onclick="duplicaCorso(${c.id})">📋 Duplica</button>
         <button class="btn btn-ghost btn-sm danger" onclick="eliminaCorso(${c.id})">🗑️</button>
+      </div>
+    </div>
+  </article>`;
+}
+
+function lezMatchHTML(c,l){
+  return `
+  <article class="card lezcard">
+    <div class="lez">
+      <div class="thumb">
+        ${l.fumetto ? `<img src="${l.fumetto}" alt="Immagine">` : `<div class="empty">🖼️<br>nessuna immagine</div>`}
+      </div>
+      <div class="lez-body">
+        <h3>${esc(l.titolo)}</h3>
+        <p class="concetto" style="color:var(--muted);text-transform:none">in 🎓 ${esc(c.titolo)}</p>
+        ${l.concetto?`<p class="concetto">${esc(l.concetto)}</p>`:""}
+        <div class="pills">
+          ${tagList(l.tags).map(t=>`<span class="pill tag">#${esc(t)}</span>`).join("")}
+        </div>
+        <div class="actions no-print">
+          <button class="btn btn-primary btn-sm" onclick="apriLezioneGlobale(${c.id},${l.id})">▶️ Presenta</button>
+          <button class="btn btn-ghost btn-sm" onclick="apriCorso(${c.id})">📂 Apri corso</button>
+        </div>
       </div>
     </div>
   </article>`;
@@ -310,17 +446,28 @@ function renderCorso(){
   const c = corsoCorrente();
   if(!c){ view="corsi"; renderCorsi(); return; }
   const lez = c.lezioni||[];
+  const ql = query.toLowerCase();
   const filt = lez.filter(l =>
-    (l.titolo||"").toLowerCase().includes(query.toLowerCase()) ||
-    (l.concetto||"").toLowerCase().includes(query.toLowerCase()));
+    (l.titolo||"").toLowerCase().includes(ql) ||
+    (l.concetto||"").toLowerCase().includes(ql) ||
+    (l.tags||"").toLowerCase().includes(ql));
+
+  // statistiche corso
+  const tot = lez.reduce((a,l)=>a+parseMinutes(l.durata),0);
+  const mats = [...new Set(lez.flatMap(l=>(l.materiali||"").split(/[\n,]/).map(x=>x.trim()).filter(Boolean)))];
 
   app.innerHTML = `
     <button class="btn btn-ghost btn-sm no-print" onclick="tornaCorsi()" style="margin-bottom:16px">‹ Tutti i corsi</button>
     <div class="card" style="margin-bottom:22px">
       <h2 style="font-family:var(--display);font-weight:700;font-size:26px;margin:0 0 8px">🎓 ${esc(c.titolo)}</h2>
       ${c.descrizione
-        ? `<p style="margin:0;color:var(--ink);font-size:16px;line-height:1.55;font-weight:600">${esc(c.descrizione)}</p>`
-        : `<p style="margin:0;color:var(--muted);font-style:italic">Questo corso non ha ancora una descrizione dello scopo. <button class="btn btn-ghost btn-sm" onclick="modificaCorso(${c.id})">✏️ Aggiungi descrizione</button></p>`}
+        ? `<p style="margin:0 0 14px;color:var(--ink);font-size:16px;line-height:1.55;font-weight:600">${esc(c.descrizione)}</p>`
+        : `<p style="margin:0 0 14px;color:var(--muted);font-style:italic">Questo corso non ha ancora una descrizione dello scopo. <button class="btn btn-ghost btn-sm" onclick="modificaCorso(${c.id})">✏️ Aggiungi descrizione</button></p>`}
+      <div class="pills">
+        <span class="stat">📚 ${lez.length} ${lez.length===1?"lezione":"lezioni"}</span>
+        <span class="stat">⏱️ ${tot} min totali</span>
+        <span class="stat">🎒 ${mats.length} ${mats.length===1?"materiale":"materiali"}</span>
+      </div>
       <div class="actions no-print" style="margin-top:16px">
         <button class="btn btn-primary btn-sm" onclick="nuova()">＋ Nuova lezione</button>
         <button class="btn btn-ghost btn-sm" onclick="modificaCorso(${c.id})">✏️ Modifica corso</button>
@@ -335,10 +482,10 @@ function renderCorso(){
          </div>`
       : `<div class="search no-print">
            <span>🔍</span>
-           <input id="q" placeholder="Cerca per titolo o concetto…" value="${esc(query)}">
+           <input id="q" placeholder="Cerca per titolo, concetto o tag…" value="${esc(query)}">
          </div>
          <div class="grid">
-           ${filt.map(cardHTML).join("") || `<p style="color:var(--muted)">Nessuna lezione trovata.</p>`}
+           ${filt.map((l)=>cardHTML(l, lez.indexOf(l), lez.length)).join("") || `<p style="color:var(--muted)">Nessuna lezione trovata.</p>`}
          </div>`}`;
 
   const q = document.getElementById("q");
@@ -367,25 +514,34 @@ function renderEditorCorso(){
   document.getElementById("c_descrizione").addEventListener("input", e=>{ draftCorso.descrizione=e.target.value; });
 }
 
-function cardHTML(l){
+function cardHTML(l, idx, total){
   return `
   <article class="card lezcard">
     <div class="lez">
       <div class="thumb">
         ${l.fumetto ? `<img src="${l.fumetto}" alt="Striscia a fumetti">`
-                    : `<div class="empty">🖼️<br>nessuna striscia</div>`}
+                    : `<div class="empty">🖼️<br>nessuna immagine</div>`}
+        ${(l.immagini&&l.immagini.length>1)?`<div style="text-align:center;font-size:12px;color:var(--muted);font-weight:700;margin-top:6px">🖼️ ${l.immagini.length} immagini</div>`:""}
       </div>
       <div class="lez-body">
-        <h3>${esc(l.titolo)}</h3>
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <h3 style="flex:1">${esc(l.titolo)}</h3>
+          <span class="ord no-print">
+            <button class="btn btn-ghost btn-sm iconbtn" title="Sposta su" onclick="spostaLezione(${l.id},-1)" ${idx===0?'disabled style="opacity:.35"':''}>↑</button>
+            <button class="btn btn-ghost btn-sm iconbtn" title="Sposta giù" onclick="spostaLezione(${l.id},1)" ${idx===total-1?'disabled style="opacity:.35"':''}>↓</button>
+          </span>
+        </div>
         ${l.concetto?`<p class="concetto">${esc(l.concetto)}</p>`:""}
         <div class="pills">
           ${l.durata?`<span class="pill">⏱️ ${esc(l.durata)}</span>`:""}
           ${l.online?`<span class="pill mint">💻 Online</span>`:""}
           ${l.vivo?`<span class="pill amber">👥 In presenza</span>`:""}
+          ${tagList(l.tags).map(t=>`<span class="pill tag">#${esc(t)}</span>`).join("")}
         </div>
         <div class="actions no-print">
           <button class="btn btn-primary btn-sm" onclick="presenta(${l.id})">▶️ Presenta</button>
           <button class="btn btn-ghost btn-sm" onclick="modifica(${l.id})">✏️ Modifica</button>
+          <button class="btn btn-ghost btn-sm" onclick="duplicaLezione(${l.id})">📋 Duplica</button>
           <button class="btn btn-ghost btn-sm danger" onclick="elimina(${l.id})">🗑️</button>
         </div>
       </div>
@@ -407,7 +563,7 @@ function renderEditor(){
         <input id="f_concetto" value="${esc(draft.concetto)}" placeholder="Es. Riconoscere le pause nella lettura">
       </div>
       <div class="fieldblock">
-        <label class="field">Striscia a fumetti</label>
+        <label class="field">🖼️ Immagini della lezione</label>
         <div id="comicArea"></div>
       </div>
       <div class="fieldblock">
@@ -426,6 +582,20 @@ function renderEditor(){
       </div>
       <div class="two">
         <div class="fieldblock">
+          <label class="field">📝 Compiti a casa</label>
+          <textarea id="f_compiti" rows="3" placeholder="Un compito per riga…">${esc(draft.compiti)}</textarea>
+        </div>
+        <div class="fieldblock">
+          <label class="field">✅ Verifica / valutazione</label>
+          <textarea id="f_verifica" rows="3" placeholder="Come verifichi l'apprendimento…">${esc(draft.verifica)}</textarea>
+        </div>
+      </div>
+      <div class="fieldblock">
+        <label class="field">🏷️ Tag / argomenti (separati da virgola)</label>
+        <input id="f_tags" value="${esc(draft.tags)}" placeholder="Es. grammatica, lettura, ortografia">
+      </div>
+      <div class="two">
+        <div class="fieldblock">
           <label class="field">🎒 Materiali necessari</label>
           <input id="f_materiali" value="${esc(draft.materiali)}" placeholder="Es. quaderno, schede, LIM">
         </div>
@@ -439,36 +609,37 @@ function renderEditor(){
         <button class="btn btn-ghost" onclick="annulla()">Annulla</button>
       </div>
     </div>`;
-  renderComicArea();
-  ["titolo","concetto","obiettivi","online","vivo","materiali","durata"].forEach(k=>{
+  renderImagesArea();
+  ["titolo","concetto","obiettivi","online","vivo","compiti","verifica","tags","materiali","durata"].forEach(k=>{
     document.getElementById("f_"+k).addEventListener("input", e=>{ draft[k]=e.target.value; });
   });
 }
 
-function renderComicArea(){
+function renderImagesArea(){
   const area = document.getElementById("comicArea");
   if(!area) return;
-  if(draft.fumetto){
-    area.innerHTML = `
-      <img src="${draft.fumetto}" alt="Anteprima striscia" style="max-width:100%;border-radius:12px;box-shadow:var(--shadow-sm);display:block;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm no-print" onclick="rimuoviFumetto()">✕ Rimuovi immagine</button>`;
-  } else {
-    area.innerHTML = `
-      <div class="imgpick">
-        <button type="button" class="btn btn-ghost" onclick="document.getElementById('fileComic').click()">🖼️ Carica immagine</button>
-        <button type="button" class="btn btn-ghost" onclick="document.getElementById('fileCamera').click()">📷 Scatta foto</button>
-      </div>`;
-  }
+  const imgs = draft.immagini || [];
+  area.innerHTML = `
+    ${imgs.length ? `<div class="gallery-edit">${imgs.map((src,i)=>`
+        <div class="gi"><img src="${src}" alt="Immagine ${i+1}"><button class="gi-x no-print" onclick="rimuoviImmagine(${i})" title="Rimuovi">✕</button></div>`).join("")}</div>` : ""}
+    <div class="imgpick">
+      <button type="button" class="btn btn-ghost" onclick="document.getElementById('fileComic').click()">🖼️ Carica immagine</button>
+      <button type="button" class="btn btn-ghost" onclick="document.getElementById('fileCamera').click()">📷 Scatta foto</button>
+    </div>`;
 }
 
 /* ───────────────────────── SLIDE / PRESENTAZIONE ───────────────────────── */
 function buildSlides(){
   const s = [{type:"cover", theme:"t-cover", ico:"📖", kicker:"Lezione"}];
+  if((draft.immagini||[]).length>1)
+    s.push({type:"gallery", theme:"t-cover", ico:"🖼️", kicker:"Immagini", title:"Immagini della lezione"});
   const secs = [
-    {key:"obiettivi", theme:"t-obj",    ico:"🎯", kicker:"Obiettivi", title:"Obiettivi didattici"},
-    {key:"online",    theme:"t-online", ico:"💻", kicker:"Online",    title:"Attività online"},
-    {key:"vivo",      theme:"t-vivo",   ico:"👥", kicker:"In classe", title:"Attività in presenza"},
-    {key:"mat",       theme:"t-mat",    ico:"🎒", kicker:"Materiali", title:"Materiali e durata"},
+    {key:"obiettivi", theme:"t-obj",      ico:"🎯", kicker:"Obiettivi", title:"Obiettivi didattici"},
+    {key:"online",    theme:"t-online",   ico:"💻", kicker:"Online",    title:"Attività online"},
+    {key:"vivo",      theme:"t-vivo",     ico:"👥", kicker:"In classe", title:"Attività in presenza"},
+    {key:"mat",       theme:"t-mat",      ico:"🎒", kicker:"Materiali", title:"Materiali e durata"},
+    {key:"compiti",   theme:"t-compiti",  ico:"📝", kicker:"Compiti",   title:"Compiti a casa"},
+    {key:"verifica",  theme:"t-verifica", ico:"✅", kicker:"Verifica",  title:"Verifica e valutazione"},
   ];
   secs.forEach(sec=>{
     const has = sec.key==="mat" ? (draft.materiali||draft.durata) : draft[sec.key];
@@ -488,11 +659,13 @@ function renderSlides(){
       <button class="btn btn-ghost btn-sm" onclick="annulla()">‹ Lezioni</button>
       <span class="grow"></span>
       <span class="savedchip" id="savedchip">✓ Salvato</span>
+      <button class="btn btn-ghost btn-sm" onclick="timerShow()" title="Timer in classe">⏱️ Timer</button>
+      <button class="btn btn-ghost btn-sm" onclick="toggleFullscreen()" title="Schermo intero (F)">⛶</button>
       <button class="btn ${editMode?'btn-primary':'btn-ghost'} btn-sm" onclick="toggleEdit()">
         ${editMode?'✅ Fine modifica':'✏️ Abilita modifica'}
       </button>
       <button class="btn btn-ghost btn-sm" onclick="modifica(${draft.id})">🗂️ Scheda</button>
-      <button class="btn btn-ghost btn-sm" onclick="stampaTutto()">🖨️ Stampa</button>
+      <button class="btn btn-ghost btn-sm" onclick="stampaTutto()">🖨️ Stampa / PDF</button>
     </div>
     <div class="stage ${editMode?'edit-on':''}">
       <div class="slide ${s.theme}" id="slide">
@@ -527,10 +700,20 @@ function slideInner(s){
           ${draft.durata?`<span class="pill">⏱️ ${esc(draft.durata)}</span>`:""}
           ${draft.online?`<span class="pill mint">💻 Online</span>`:""}
           ${draft.vivo?`<span class="pill amber">👥 In presenza</span>`:""}
+          ${tagList(draft.tags).map(t=>`<span class="pill tag">#${esc(t)}</span>`).join("")}
         </div>
         ${draft.fumetto
-          ? `<img class="cover-img" src="${draft.fumetto}" alt="Striscia a fumetti">`
+          ? `<img class="cover-img" src="${draft.fumetto}" alt="Immagine della lezione">`
           : (editMode?`<div class="addrow"><button class="btn btn-sm" onclick="document.getElementById('fileComic').click()">🖼️ Aggiungi immagine</button> <button class="btn btn-sm" onclick="document.getElementById('fileCamera').click()">📷 Scatta foto</button></div>`:"")}
+      </div>`;
+  }
+  if(s.type==="gallery"){
+    return `
+      <div class="kicker"><span class="ico">${s.ico}</span> ${s.kicker}</div>
+      <h2>${esc(s.title)}</h2>
+      <div class="content">
+        <div class="gallery">${(draft.immagini||[]).map(src=>`<img src="${src}" alt="Immagine">`).join("")}</div>
+        ${editMode?`<div class="addrow"><button class="btn btn-sm" onclick="document.getElementById('fileComic').click()">🖼️ Aggiungi</button> <button class="btn btn-sm" onclick="document.getElementById('fileCamera').click()">📷 Scatta</button></div>`:""}
       </div>`;
   }
   // section
@@ -612,6 +795,7 @@ function upsert(){
   const c = corsoCorrente(); if(!c) return;
   if(!c.lezioni) c.lezioni = [];
   if(draft.id==null) draft.id = Date.now();
+  draft.fumetto = (draft.immagini&&draft.immagini[0]) || "";
   const i = c.lezioni.findIndex(l=>l.id===draft.id);
   if(i>=0) c.lezioni[i]=JSON.parse(JSON.stringify(draft)); else c.lezioni.push(JSON.parse(JSON.stringify(draft)));
   save();
@@ -624,10 +808,20 @@ function goTo(i){
 }
 function toggleEdit(){ editMode = !editMode; renderSlides(); }
 
+function toggleFullscreen(){
+  const el = document.querySelector('.stage');
+  if(!el) return;
+  if(!document.fullscreenElement && !document.webkitFullscreenElement){
+    (el.requestFullscreen || el.webkitRequestFullscreen || (()=>{})).call(el);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || (()=>{})).call(document);
+  }
+}
+
 function stampaTutto(){
   // mostra tutte le slide in stampa
   const slides = buildSlides();
-  const wasEdit = editMode; editMode=false;
+  const wasEdit = editMode, wasIdx = slideIndex; editMode=false;
   let html="";
   slides.forEach((s,idx)=>{ slideIndex=idx; html+=`<div class="slide ${s.theme}"><span class="num">${idx+1} / ${slides.length}</span>${slideInner(s)}</div>`; });
   const stage = document.createElement("div");
@@ -635,7 +829,51 @@ function stampaTutto(){
   app.appendChild(stage);
   window.print();
   stage.remove();
-  editMode=wasEdit; renderSlides();
+  editMode=wasEdit; slideIndex=wasIdx; renderSlides();
+}
+
+/* ───────────────────────── TIMER IN CLASSE ───────────────────────── */
+let timer = {sec:0, run:false, int:null};
+function timerFmt(s){ const m=Math.floor(s/60), x=s%60; return m+":"+String(x).padStart(2,"0"); }
+function timerRender(){
+  const b = document.getElementById("timerbox"); if(!b) return;
+  b.innerHTML = `
+    <div class="t-disp ${(timer.sec<=10&&timer.sec>0)?'warn':''}">${timerFmt(timer.sec)}</div>
+    <div class="t-row">
+      <button onclick="timerAdj(-60)" title="-1 minuto">−1′</button>
+      <button onclick="timerToggle()" title="Avvia/Pausa">${timer.run?'⏸':'▶️'}</button>
+      <button onclick="timerAdj(60)" title="+1 minuto">+1′</button>
+      <button onclick="timerReset()" title="Azzera">↺</button>
+      <button onclick="timerHide()" title="Chiudi">✕</button>
+    </div>`;
+}
+function timerShow(){
+  const b = document.getElementById("timerbox"); b.classList.remove("hidden");
+  if(timer.sec===0) timer.sec = (parseMinutes(draft.durata)||5)*60;
+  timerRender();
+}
+function timerHide(){ timerStop(); document.getElementById("timerbox").classList.add("hidden"); }
+function timerToggle(){ timer.run ? timerStop() : timerStart(); }
+function timerStart(){
+  if(timer.sec<=0) return;
+  timer.run=true;
+  timer.int=setInterval(()=>{
+    timer.sec--;
+    if(timer.sec<=0){ timer.sec=0; timerStop(); timerDing(); }
+    timerRender();
+  },1000);
+  timerRender();
+}
+function timerStop(){ timer.run=false; clearInterval(timer.int); timer.int=null; timerRender(); }
+function timerReset(){ timerStop(); timer.sec=(parseMinutes(draft.durata)||5)*60; timerRender(); }
+function timerAdj(d){ timer.sec=Math.max(0, timer.sec+d); timerRender(); }
+function timerDing(){
+  try{
+    const a=new (window.AudioContext||window.webkitAudioContext)();
+    const o=a.createOscillator(), g=a.createGain();
+    o.connect(g); g.connect(a.destination); o.frequency.value=880; g.gain.value=.12;
+    o.start(); setTimeout(()=>{o.stop(); a.close();},600);
+  }catch(e){}
 }
 
 /* ───────────────────────── AZIONI CORSO ───────────────────────── */
@@ -671,13 +909,35 @@ function eliminaCorso(id){
   if(currentCorsoId===id){ currentCorsoId=null; view="corsi"; }
   render();
 }
+function spostaCorso(id,dir){
+  const i = corsi.findIndex(c=>c.id===id), j = i+dir;
+  if(i<0 || j<0 || j>=corsi.length) return;
+  [corsi[i],corsi[j]] = [corsi[j],corsi[i]];
+  save(); renderCorsi();
+}
+function duplicaCorso(id){
+  const i = corsi.findIndex(c=>c.id===id); if(i<0) return;
+  const copy = JSON.parse(JSON.stringify(corsi[i]));
+  copy.id = Date.now();
+  copy.titolo = (copy.titolo||"Corso") + " (copia)";
+  (copy.lezioni||[]).forEach((l,k)=>{ l.id = Date.now()+k+1; });
+  corsi.splice(i+1, 0, copy);
+  save(); renderCorsi();
+  toast("Corso duplicato ✓");
+}
 
 /* ───────────────────────── AZIONI LEZIONE ───────────────────────── */
 function nuova(){ draft = EMPTY(); draft.id = Date.now(); view="edit"; render(); }
-function modifica(id){ draft = JSON.parse(JSON.stringify(lezioniCorrenti().find(l=>l.id===id))); view="edit"; editMode=false; render(); }
-function presenta(id){ draft = JSON.parse(JSON.stringify(lezioniCorrenti().find(l=>l.id===id))); view="slide"; slideIndex=0; editMode=false; render(); }
+function modifica(id){ draft = normLez(JSON.parse(JSON.stringify(lezioniCorrenti().find(l=>l.id===id)))); view="edit"; editMode=false; render(); }
+function presenta(id){ draft = normLez(JSON.parse(JSON.stringify(lezioniCorrenti().find(l=>l.id===id)))); view="slide"; slideIndex=0; editMode=false; render(); }
+function apriLezioneGlobale(cid,lid){ currentCorsoId=cid; presenta(lid); }
 function annulla(){ view="corso"; editMode=false; draft=EMPTY(); render(); }
-function rimuoviFumetto(){ draft.fumetto=""; renderComicArea(); }
+function rimuoviImmagine(i){
+  draft.immagini.splice(i,1);
+  draft.fumetto = draft.immagini[0]||"";
+  if(view==="edit") renderImagesArea();
+  else { persist(); renderSlides(); }
+}
 
 function salvaEditor(){
   if(!draft.titolo.trim()){ alert("Dai un titolo alla lezione prima di salvare."); return; }
@@ -689,14 +949,53 @@ function elimina(id){
   const c = corsoCorrente(); if(c){ c.lezioni = (c.lezioni||[]).filter(l=>l.id!==id); save(); }
   render();
 }
+function spostaLezione(id,dir){
+  const lz = lezioniCorrenti();
+  const i = lz.findIndex(l=>l.id===id), j = i+dir;
+  if(i<0 || j<0 || j>=lz.length) return;
+  [lz[i],lz[j]] = [lz[j],lz[i]];
+  save(); renderCorso();
+}
+function duplicaLezione(id){
+  const lz = lezioniCorrenti();
+  const i = lz.findIndex(l=>l.id===id); if(i<0) return;
+  const copy = JSON.parse(JSON.stringify(lz[i]));
+  copy.id = Date.now();
+  copy.titolo = (copy.titolo||"Lezione") + " (copia)";
+  lz.splice(i+1, 0, copy);
+  save(); renderCorso();
+  toast("Lezione duplicata ✓");
+}
+
+/* ── Compressione immagini (riduce dimensione e salva spazio) ── */
+function compressImage(dataURL){
+  return new Promise(res=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const max = 1280;
+      let w = img.width, h = img.height;
+      if(w>max || h>max){ if(w>=h){ h=Math.round(h*max/w); w=max; } else { w=Math.round(w*max/h); h=max; } }
+      const c = document.createElement("canvas");
+      c.width=w; c.height=h;
+      c.getContext("2d").drawImage(img,0,0,w,h);
+      try{ res(c.toDataURL("image/jpeg",0.82)); }
+      catch(e){ res(dataURL); }
+    };
+    img.onerror = ()=>res(dataURL);
+    img.src = dataURL;
+  });
+}
 
 /* ── Caricamento immagine (galleria o fotocamera) ── */
 function caricaImmagine(e){
   const file = e.target.files[0]; if(!file) return;
   const r = new FileReader();
-  r.onload = ()=>{
-    draft.fumetto = r.result;
-    if(view==="edit") renderComicArea();
+  r.onload = async ()=>{
+    const compressed = await compressImage(r.result);
+    if(!Array.isArray(draft.immagini)) draft.immagini = [];
+    draft.immagini.push(compressed);
+    draft.fumetto = draft.immagini[0];
+    if(view==="edit") renderImagesArea();
     else { persist(); renderSlides(); }
   };
   r.readAsDataURL(file);
@@ -709,7 +1008,7 @@ document.getElementById("fileCamera").addEventListener("change", caricaImmagine)
 function toast(msg, isErr){
   const t = document.getElementById("toast");
   t.textContent = msg; t.className = "toast show" + (isErr?" err":"");
-  clearTimeout(toast._t); toast._t = setTimeout(()=>t.className="toast", 2600);
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.className="toast", 2800);
 }
 
 /* ── Unione dati importati (da file o da Drive) ── */
@@ -741,6 +1040,7 @@ function applyImported(data, sorgente){
   } else {
     corsi = nuoviCorsi;
   }
+  normalizeAll();
   save(); view="corsi"; currentCorsoId=null; query=""; render();
   toast("Corsi importati ✓");
 }
@@ -766,8 +1066,17 @@ document.getElementById("fileBackup").addEventListener("change", e=>{
 
 /* ──────────────── GOOGLE DRIVE ──────────────── */
 let driveToken = null, driveExp = 0, driveClient = null, driveOn = false;
+let _syncT = null;
 
 function driveConfigurato(){ return !!GOOGLE_CLIENT_ID; }
+function scheduleSync(){ clearTimeout(_syncT); _syncT = setTimeout(()=>driveSave(true), 4000); }
+function toggleAutoSync(){
+  pref.autoSync = !pref.autoSync; savePref(); renderToolbar();
+  if(pref.autoSync){
+    if(driveOn){ toast("Salvataggio automatico su Drive attivo ✓"); scheduleSync(); }
+    else withDrive(()=>{ toast("Salvataggio automatico su Drive attivo ✓"); scheduleSync(); });
+  } else toast("Salvataggio automatico disattivato");
+}
 
 function avvisoConfig(){
   alert(
@@ -827,11 +1136,11 @@ async function driveFindFile(folderId){
   return (d.files && d.files[0]) ? d.files[0].id : null;
 }
 
-function driveSave(){
+function driveSave(silent){
   withDrive(async ()=>{
     try{
-      if(!corsi.length){ toast("Nessun corso da salvare.", true); return; }
-      toast("Salvataggio su Drive…");
+      if(!corsi.length){ if(!silent) toast("Nessun corso da salvare.", true); return; }
+      if(!silent) toast("Salvataggio su Drive…");
       const folderId = await driveGetFolderId();
       const fileId = await driveFindFile(folderId);
       const meta = fileId ? {} : {name:DRIVE_FILE, parents:[folderId]};
@@ -846,7 +1155,7 @@ function driveSave(){
         ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
         : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
       await driveFetch(url, {method: fileId?"PATCH":"POST", headers:{"Content-Type":`multipart/related; boundary=${boundary}`}, body});
-      toast(`Salvato su Drive · cartella "${DRIVE_FOLDER}" ✓`);
+      toast(silent ? "🔄 Sincronizzato su Drive ✓" : `Salvato su Drive · cartella "${DRIVE_FOLDER}" ✓`);
     }catch(err){ toast(err.message||"Errore nel salvataggio su Drive.", true); }
   });
 }
@@ -864,28 +1173,62 @@ function driveLoad(){
   });
 }
 
+/* ──────────────── PREFERENZE (tema, testo) ──────────────── */
+function loadPref(){
+  try{ const p = JSON.parse(localStorage.getItem(PREF_KEY)); if(p) pref = Object.assign(pref, p); }catch(e){}
+  applyPref();
+}
+function applyPref(){
+  document.documentElement.dataset.theme = pref.theme;
+  document.documentElement.style.setProperty("--scale", pref.scale);
+}
+function savePref(){ localStorage.setItem(PREF_KEY, JSON.stringify(pref)); }
+function toggleTheme(){ pref.theme = pref.theme==="dark" ? "light" : "dark"; applyPref(); savePref(); renderToolbar(); }
+function setScale(d){
+  pref.scale = Math.min(1.5, Math.max(0.8, Math.round((pref.scale+d)*100)/100));
+  applyPref(); savePref();
+  toast("Dimensione testo: "+Math.round(pref.scale*100)+"%");
+}
+
+/* ──────────────── PWA / INSTALLAZIONE ──────────────── */
+let deferredInstall = null;
+window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferredInstall=e; renderToolbar(); });
+function installApp(){ if(deferredInstall){ deferredInstall.prompt(); deferredInstall=null; renderToolbar(); } }
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
 /* ── Barra strumenti (dinamica in base allo stato Drive) ── */
 function renderToolbar(){
   const tb = document.getElementById("toolbar");
   const drive = driveOn
-    ? `<span class="drivechip">☁️ Drive collegato</span>
-       <button class="btn btn-ghost btn-sm" id="btnDriveSave">☁️ Salva su Drive</button>
-       <button class="btn btn-ghost btn-sm" id="btnDriveLoad">☁️ Carica da Drive</button>`
-    : `<button class="btn btn-ghost btn-sm" id="btnDriveConnect">☁️ Collega Google Drive</button>`;
+    ? `<span class="drivechip">☁️ Drive</span>
+       <button class="btn btn-ghost btn-sm" id="btnDriveSave">☁️ Salva</button>
+       <button class="btn btn-ghost btn-sm" id="btnDriveLoad">☁️ Carica</button>
+       <button class="btn ${pref.autoSync?'btn-primary':'btn-ghost'} btn-sm" id="btnAuto" title="Salvataggio automatico su Drive">🔄 ${pref.autoSync?'Auto ON':'Auto'}</button>`
+    : `<button class="btn btn-ghost btn-sm" id="btnDriveConnect">☁️ Collega Drive</button>`;
+  const install = deferredInstall ? `<button class="btn btn-ghost btn-sm iconbtn" id="btnInstall" title="Installa app">📲</button>` : "";
   tb.innerHTML =
-    drive +
+    `<button class="btn btn-ghost btn-sm iconbtn" id="btnTheme" title="Tema chiaro/scuro">${pref.theme==='dark'?'☀️':'🌙'}</button>
+     <button class="btn btn-ghost btn-sm iconbtn" id="btnAm" title="Testo più piccolo">A−</button>
+     <button class="btn btn-ghost btn-sm iconbtn" id="btnAp" title="Testo più grande">A+</button>`
+    + drive + install +
     `<button class="btn btn-ghost btn-sm iconbtn" id="btnExport" title="Backup su file">⬇️</button>
      <button class="btn btn-ghost btn-sm iconbtn" id="btnImport" title="Ripristina da file">⬆️</button>
      <button class="btn btn-primary btn-sm" id="btnNew">＋ Nuovo corso</button>`;
   const on = (id, fn)=>{ const el=document.getElementById(id); if(el) el.onclick=fn; };
+  on("btnTheme", toggleTheme);
+  on("btnAm", ()=>setScale(-0.1));
+  on("btnAp", ()=>setScale(0.1));
   on("btnDriveConnect", ()=> withDrive(()=>toast("Google Drive collegato ✓")));
-  on("btnDriveSave", driveSave);
+  on("btnDriveSave", ()=>driveSave(false));
   on("btnDriveLoad", driveLoad);
+  on("btnAuto", toggleAutoSync);
+  on("btnInstall", installApp);
   on("btnExport", exportFile);
   on("btnImport", ()=> document.getElementById("fileBackup").click());
   on("btnNew", nuovoCorso);
 }
-renderToolbar();
 
 /* ── Tastiera per le slide ── */
 document.addEventListener("keydown", e=>{
@@ -893,7 +1236,8 @@ document.addEventListener("keydown", e=>{
   if(e.target.isContentEditable || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
   if(e.key==="ArrowRight") goTo(slideIndex+1);
   else if(e.key==="ArrowLeft") goTo(slideIndex-1);
-  else if(e.key==="Escape") annulla();
+  else if(e.key==="Escape"){ if(document.fullscreenElement) return; annulla(); }
+  else if(e.key==="f" || e.key==="F") toggleFullscreen();
 });
 
 /* placeholder per contenteditable */
@@ -902,7 +1246,9 @@ ph.textContent = `[contenteditable].is-empty:before{content:attr(data-ph);opacit
 document.head.appendChild(ph);
 
 /* ── Avvio ── */
+loadPref();
 load();
+renderToolbar();
 render();
 </script>
 </body>
